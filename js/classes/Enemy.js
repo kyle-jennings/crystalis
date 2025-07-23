@@ -64,6 +64,26 @@ export class Enemy {
         return null; // No collision
     }
     
+    // Method to check collision with houses (called from game class)
+    checkHouseCollisions(houses) {
+        for (const house of houses) {
+            if (house.checkCollision(this.x, this.y, this.width, this.height)) {
+                return house; // Return the colliding house
+            }
+        }
+        return null; // No collision
+    }
+    
+    // Method to check collision with walls (called from game class)
+    checkWallCollisions(walls) {
+        for (const wall of walls) {
+            if (wall.checkCollision(this.x, this.y, this.width, this.height)) {
+                return wall; // Return the colliding wall
+            }
+        }
+        return null; // No collision
+    }
+    
     // Method to check collision with mountains (called from game class)
     checkMountainCollisions(mountains) {
         for (const mountain of mountains) {
@@ -83,17 +103,17 @@ export class Enemy {
     }
     
     // Method to try alternative movement (horizontal or vertical only)
-    tryAlternativeMovement(trees, mountains = [], stalactites = []) {
+    tryAlternativeMovement(trees, mountains = [], stalactites = [], houses = [], walls = []) {
         // Try horizontal movement only
         this.x = this.originalX + this.attemptedMoveX;
         this.y = this.originalY;
         
-        if (this.checkTreeCollisions(trees) || this.checkMountainCollisions(mountains) || this.checkStalactiteCollisions(stalactites)) {
+        if (this.checkTreeCollisions(trees) || this.checkMountainCollisions(mountains) || this.checkStalactiteCollisions(stalactites) || this.checkHouseCollisions(houses) || this.checkWallCollisions(walls)) {
             // Horizontal failed, try vertical only
             this.x = this.originalX;
             this.y = this.originalY + this.attemptedMoveY;
             
-            if (this.checkTreeCollisions(trees) || this.checkMountainCollisions(mountains) || this.checkStalactiteCollisions(stalactites)) {
+            if (this.checkTreeCollisions(trees) || this.checkMountainCollisions(mountains) || this.checkStalactiteCollisions(stalactites) || this.checkHouseCollisions(houses) || this.checkWallCollisions(walls)) {
                 // Both failed, stay in original position
                 this.x = this.originalX;
                 this.y = this.originalY;

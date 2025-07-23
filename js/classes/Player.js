@@ -102,6 +102,26 @@ export default class Player {
         return null; // No collision
     }
     
+    // Method to check collision with houses (called from game class)
+    checkHouseCollisions(houses) {
+        for (const house of houses) {
+            if (house.checkCollision(this.x, this.y, this.width, this.height)) {
+                return house; // Return the colliding house
+            }
+        }
+        return null; // No collision
+    }
+    
+    // Method to check collision with walls (called from game class)
+    checkWallCollisions(walls) {
+        for (const wall of walls) {
+            if (wall.checkCollision(this.x, this.y, this.width, this.height)) {
+                return wall; // Return the colliding wall
+            }
+        }
+        return null; // No collision
+    }
+    
     // Method to check if player is inside mountains (called from game class)
     checkMountainSlowdown(mountains) {
         for (const mountain of mountains) {

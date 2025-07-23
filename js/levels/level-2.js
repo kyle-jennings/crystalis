@@ -1,77 +1,123 @@
-// Level 2 - Cave Area
-import { Slime, Ant } from '../Enemy.js';
-import { ExperienceOrb } from '../Item.js';
-import Tree from '../Tree.js';
-import Mountain from '../Mountain.js';
-import Stalactite from '../Stalactite.js';
+// Level 1 - First Area
+import { Slime, Ant } from '../classes/Enemy.js';
+import { ExperienceOrb } from '../classes/Item.js';
+import Tree from '../classes/Tree.js';
+import Mountain from '../classes/Mountain.js';
 
-export function initializeLevel2(game) {
+// Level 1 canvas configuration (default size)
+export const canvasConfigs = {
+    canvasWidth: 512,
+    canvasHeight: 480,
+    width: 512,
+    height: 480,
+    worldWidth: 1024,
+    worldHeight: 768,
+    playerX: 256,
+    playerY: 400
+};
+
+// Level 1 background configuration
+export const backgroundConfigs = {
+    backgroundColor: '#2d5016', // Forest green
+    accentColor: '#1a3009', // Darker green
+    theme: 'forest'
+};
+
+// Starting area enemy configurations
+const enemyConfigs = [
+    { type: 'Slime', x: 300, y: 300, area: 'Starting area' },
+    { type: 'Slime', x: 200, y: 250, area: 'Starting area' },
+    { type: 'Ant', x: 400, y: 350, area: 'Starting area' },
+    { type: 'Ant', x: 150, y: 400, area: 'Starting area' }
+];
+
+// Item configurations (experience orbs scattered across map)
+const itemConfigs = [
+    { x: 180, y: 200, value: 5, description: 'Starting area' },
+    { x: 350, y: 280, value: 5, description: 'Starting area' },
+    { x: 750, y: 150, value: 5, description: 'Far right' },
+    { x: 900, y: 600, value: 5, description: 'Far bottom right' },
+    { x: 100, y: 650, value: 5, description: 'Far bottom left' }
+];
+
+// Tree configurations (scattered across entire 1024x768 map)
+const treeConfigs = [
+    // Starting area trees
+    { x: 100, y: 100, area: 'Starting area' },
+    { x: 200, y: 150, area: 'Starting area' },
+    { x: 350, y: 120, area: 'Starting area' },
+    { x: 450, y: 200, area: 'Starting area' },
+    { x: 150, y: 300, area: 'Starting area' },
+    
+    // Middle area trees
+    { x: 600, y: 250, area: 'Middle area' },
+    { x: 750, y: 180, area: 'Middle area' },
+    { x: 520, y: 400, area: 'Middle area' },
+    { x: 680, y: 350, area: 'Middle area' },
+    { x: 800, y: 300, area: 'Middle area' },
+    
+    // Right side trees
+    { x: 900, y: 150, area: 'Right side' },
+    { x: 950, y: 400, area: 'Right side' },
+    { x: 850, y: 500, area: 'Right side' },
+    
+    // Bottom area trees
+    { x: 300, y: 600, area: 'Bottom area' },
+    { x: 500, y: 650, area: 'Bottom area' },
+    { x: 700, y: 600, area: 'Bottom area' },
+    { x: 50, y: 550, area: 'Bottom area' },
+    { x: 150, y: 700, area: 'Bottom area' },
+    
+    // Top area trees
+    { x: 600, y: 80, area: 'Top area' },
+    { x: 800, y: 50, area: 'Top area' },
+    { x: 400, y: 50, area: 'Top area' },
+    
+    // Left side trees
+    { x: 50, y: 200, area: 'Left side' },
+    { x: 80, y: 350, area: 'Left side' },
+    { x: 30, y: 450, area: 'Left side' }
+];
+
+// Mountain configurations (various areas across map)
+const mountainConfigs = [
+    { x: 750, y: 500, hasPortal: false, portalDestination: null, description: 'Lower right area' },
+    { x: 100, y: 50, hasPortal: false, portalDestination: null, description: 'Upper left area' },
+    { x: 850, y: 100, hasPortal: false, portalDestination: null, description: 'Upper right area' },
+    { x: 300, y: 650, hasPortal: true, portalDestination: 2, description: 'Lower middle - PORTAL TO LEVEL 2' }
+];
+
+export function initialize(game) {
     // Clear existing entities
     game.enemies = [];
     game.items = [];
     game.trees = [];
     game.mountains = [];
     game.stalactites = [];
+    game.houses = [];
+    game.walls = [];
     
-    // Cave-themed enemies (more numerous and aggressive)
-    // Cave entrance area enemies
-    game.enemies.push(new Slime(200, 300));
-    game.enemies.push(new Slime(350, 250));
-    game.enemies.push(new Ant(400, 400));
-    game.enemies.push(new Ant(150, 350));
+    // Create enemies from configuration
+    enemyConfigs.forEach(config => {
+        if (config.type === 'Slime') {
+            game.enemies.push(new Slime(config.x, config.y));
+        } else if (config.type === 'Ant') {
+            game.enemies.push(new Ant(config.x, config.y));
+        }
+    });
     
-    // Deeper cave enemies
-    game.enemies.push(new Slime(600, 200));
-    game.enemies.push(new Slime(750, 350));
-    game.enemies.push(new Ant(500, 500));
-    game.enemies.push(new Ant(800, 450));
-    game.enemies.push(new Slime(900, 250));
+    // Create items from configuration
+    itemConfigs.forEach(config => {
+        game.items.push(new ExperienceOrb(config.x, config.y, config.value));
+    });
     
-    // Cave tunnels enemies
-    game.enemies.push(new Ant(300, 600));
-    game.enemies.push(new Slime(450, 650));
-    game.enemies.push(new Ant(700, 600));
+    // Create trees from configuration
+    treeConfigs.forEach(config => {
+        game.trees.push(new Tree(config.x, config.y));
+    });
     
-    // Experience orbs scattered throughout cave
-    game.items.push(new ExperienceOrb(180, 180, 8)); // Higher value in caves
-    game.items.push(new ExperienceOrb(450, 300, 8));
-    game.items.push(new ExperienceOrb(700, 200, 10)); // Rare find
-    game.items.push(new ExperienceOrb(850, 400, 8));
-    game.items.push(new ExperienceOrb(300, 550, 8));
-    game.items.push(new ExperienceOrb(600, 650, 10)); // Deep cave treasure
-    game.items.push(new ExperienceOrb(100, 400, 8));
-    
-    // Cave "mountains" - these represent large rock formations/cave walls
-    // Major cave chambers separated by rock walls
-    game.mountains.push(new Mountain(150, 50));  // North chamber wall
-    game.mountains.push(new Mountain(700, 80));  // Northeast wall
-    game.mountains.push(new Mountain(50, 450));  // West wall
-    game.mountains.push(new Mountain(850, 350)); // East wall
-    game.mountains.push(new Mountain(400, 500, true, 1)); // Central cave formation - PORTAL BACK TO LEVEL 1
-    
-    // Stalactites and Stalagmites - Cave atmosphere and minor obstacles
-    // Entry chamber stalactites
-    game.stalactites.push(new Stalactite(120, 100, true));  // Stalactite (hanging)
-    game.stalactites.push(new Stalactite(180, 150, false)); // Stalagmite (floor)
-    game.stalactites.push(new Stalactite(280, 80, true));   // Stalactite
-    game.stalactites.push(new Stalactite(320, 200, false)); // Stalagmite
-    
-    // Main chamber stalactites
-    game.stalactites.push(new Stalactite(450, 120, true));  // Stalactite
-    game.stalactites.push(new Stalactite(480, 350, false)); // Stalagmite
-    game.stalactites.push(new Stalactite(550, 180, true));  // Stalactite
-    game.stalactites.push(new Stalactite(620, 300, false)); // Stalagmite
-    
-    // Deep cave stalactites
-    game.stalactites.push(new Stalactite(750, 200, true));  // Stalactite
-    game.stalactites.push(new Stalactite(780, 280, false)); // Stalagmite
-    game.stalactites.push(new Stalactite(850, 150, true));  // Stalactite
-    game.stalactites.push(new Stalactite(920, 250, false)); // Stalagmite
-    
-    // Lower tunnel stalactites
-    game.stalactites.push(new Stalactite(200, 580, true));  // Stalactite
-    game.stalactites.push(new Stalactite(250, 620, false)); // Stalagmite
-    game.stalactites.push(new Stalactite(380, 570, true));  // Stalactite
-    game.stalactites.push(new Stalactite(650, 590, true));  // Stalactite
-    game.stalactites.push(new Stalactite(720, 630, false)); // Stalagmite
+    // Create mountains from configuration
+    mountainConfigs.forEach(config => {
+        game.mountains.push(new Mountain(config.x, config.y, config.hasPortal, config.portalDestination));
+    });
 }

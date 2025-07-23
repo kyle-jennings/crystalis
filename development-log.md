@@ -343,3 +343,36 @@ git push -u origin main
 - Maintains player agency - portals are optional pathways
 - Expands game world beyond single-screen limitations
 - Sets foundation for larger adventure game structure
+
+### Village Level (Level 3)
+**Request**: Add a new level - village that has no enemies  
+**Time**: July 23, 2025  
+**Files Modified**:
+- `js/levels/level-3.js` - Created new village level with peaceful environment
+- `js/crystalis-game.js` - Added level 3 import, increased maxLevel to 3, added village background
+- `js/levels/level-2.js` - Added portal from cave to village
+
+**Technical Implementation**:
+- **Safe Zone Design**: Village has no enemies - completely peaceful environment
+- **Village Structures**: Buildings represented by mountains (houses, shop, inn, temple, etc.)
+- **Village Layout**: Bordered by trees representing walls/fencing for enclosed feel
+- **Experience Rewards**: High-value experience orbs scattered throughout village
+- **Portal System**: Cave level (2) has portal to village, village has portal back to cave
+
+**Village Features**:
+- 7 village buildings: houses, shop, inn, village hall, blacksmith, temple
+- Enclosed village design with tree borders (north, south, east, west walls)
+- Decorative trees for village green and park areas
+- High-value experience orbs (10-15 points) as village rewards
+- Sandy brown background theme to distinguish from forest/cave levels
+
+**Portal Network**:
+- Level 1 (Forest) ↔ Level 2 (Cave) ↔ Level 3 (Village)
+- Multiple ways to navigate between all three levels
+- Village serves as safe haven for healing and collecting rewards
+
+**Gameplay Impact**:
+- Provides safe zone for players to rest without enemy pressure
+- Creates hub area for potential future NPCs or story elements
+- Offers high-value experience rewards in peaceful environment
+- Expands exploration with distinct visual and gameplay themes

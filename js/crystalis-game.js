@@ -1,15 +1,27 @@
 // Crystalis Clone - First Area Implementation
-import Player from './Player.js';
-import { Enemy, Slime, Ant } from './Enemy.js';
-import { SwordProjectile } from './Projectile.js';
-import { ExperienceOrb } from './Item.js';
-import { Effect, HitEffect, HealEffect, MeleeAttackEffect } from './Effect.js';
+import Player from './classes/Player.js';
+// import { Enemy, Slime, Ant } from './classes/Enemy.js';
+import { SwordProjectile } from './classes/Projectile.js';
+import { ExperienceOrb } from './classes/Item.js';
+import {
+    // Effect,
+    HitEffect,
+    HealEffect,
+    MeleeAttackEffect } from './classes/Effect.js';
 import { GAME_KEYS, MOVEMENT_KEYS, ACTION_KEYS, INPUT_CONFIG } from './inputMappings.js';
-import { initializeLevel1 } from './levels/level-1.js';
-import { initializeLevel2 } from './levels/level-2.js';
-import Tree from './Tree.js';
-import Mountain from './Mountain.js';
-import Cave from './Cave.js';
+
+// Import all level modules as objects
+import * as Level1 from './levels/level-1.js';
+import * as Level2 from './levels/level-2.js';
+import * as Level3 from './levels/level-3.js';
+
+// Level registry for easy access
+const LEVELS = {
+    1: Level1,
+    2: Level2,
+    3: Level3,
+};
+
 
 class CrystalisGame {
     constructor() {
@@ -19,6 +31,10 @@ class CrystalisGame {
         this.height = this.canvas.height;
         
         // Game state
+        this.currentLevel = 1;
+        this.maxLevel = 3;
+        this.currentLevelObj = null; // Will hold the active level module
+
         this.gameTime = 0;
         this.camera = { x: 0, y: 0 };
         this.worldWidth = 1024;
@@ -36,10 +52,9 @@ class CrystalisGame {
         this.mountains = []; // Add mountains array
         this.caves = []; // Add caves array
         this.stalactites = []; // Add stalactites array
-        
-        // Level management
-        this.currentLevel = 2;
-        this.maxLevel = 2;
+        this.houses = []; // Add houses array
+        this.walls = []; // Add walls array
+
         
         // Input handling
         this.keys = {};
@@ -66,22 +81,46 @@ class CrystalisGame {
     }
     
     loadLevel(levelNumber) {
-        // Reset player position to spawn point
-        this.player.x = 256;
-        this.player.y = 400;
+        // Set current level object
+        this.currentLevelObj = LEVELS[levelNumber];
         
-        // Load the specified level
-        switch(levelNumber) {
-            case 1:
-                initializeLevel1(this);
-                break;
-            case 2:
-                initializeLevel2(this);
-                break;
-            default:
-                console.warn(`Level ${levelNumber} not found, loading level 1`);
-                initializeLevel1(this);
-                this.currentLevel = 1;
+        if (!this.currentLevelObj) {
+            console.warn(`Level ${levelNumber} not found, loading level 1`);
+            this.currentLevelObj = LEVELS[1];
+            this.currentLevel = 1;
+        }
+        
+        // Get level configs if they exist
+        const levelConfigs = this.currentLevelObj.canvasConfigs || {};
+        
+        // Reset player position to spawn point
+        this.player.x = levelConfigs.playerX || 256;
+        this.player.y = levelConfigs.playerY || 400;
+        
+        // Adjust canvas size based on level configs
+        if (levelConfigs.canvasWidth && levelConfigs.canvasHeight) {
+            // Level has custom canvas size
+            this.canvas.width = levelConfigs.canvasWidth;
+            this.canvas.height = levelConfigs.canvasHeight;
+            this.width = levelConfigs.width || levelConfigs.canvasWidth;
+            this.height = levelConfigs.height || levelConfigs.canvasHeight;
+            this.worldWidth = levelConfigs.worldWidth || levelConfigs.canvasWidth;
+            this.worldHeight = levelConfigs.worldHeight || levelConfigs.canvasHeight;
+        } else {
+            // Use default canvas size
+            this.canvas.width = 512;
+            this.canvas.height = 480;
+            this.width = this.canvas.width;
+            this.height = this.canvas.height;
+            this.worldWidth = 1024;
+            this.worldHeight = 768;
+        }
+        
+        // Initialize the level using the level object's initialize function
+        if (typeof this.currentLevelObj.initialize === 'function') {
+            this.currentLevelObj.initialize(this);
+        } else {
+            console.error(`No initialize function found for level ${levelNumber}`);
         }
         
         console.log(`Loaded Level ${this.currentLevel}`);
@@ -196,9 +235,11 @@ class CrystalisGame {
                 const collidingTree = enemy.checkTreeCollisions(this.trees);
                 const collidingMountain = enemy.checkMountainCollisions(this.mountains);
                 const collidingStalactite = enemy.checkStalactiteCollisions(this.stalactites);
+                const collidingHouse = enemy.checkHouseCollisions(this.houses);
+                const collidingWall = enemy.checkWallCollisions(this.walls);
                 
-                if (collidingTree || collidingMountain || collidingStalactite) {
-                    enemy.tryAlternativeMovement(this.trees, this.mountains, this.stalactites);
+                if (collidingTree || collidingMountain || collidingStalactite || collidingHouse || collidingWall) {
+                    enemy.tryAlternativeMovement(this.trees, this.mountains, this.stalactites, this.houses, this.walls);
                 }
             } else {
                 // Still update animation even when frozen
@@ -286,22 +327,24 @@ class CrystalisGame {
         // Check for tree collisions and revert if necessary
         const collidingTree = this.player.checkTreeCollisions(this.trees);
         const collidingStalactite = this.player.checkStalactiteCollisions(this.stalactites);
+        const collidingHouse = this.player.checkHouseCollisions(this.houses);
+        const collidingWall = this.player.checkWallCollisions(this.walls);
         
-        if (collidingTree || collidingStalactite) {
+        if (collidingTree || collidingStalactite || collidingHouse || collidingWall) {
             // Revert to original position
             this.player.x = originalX;
             this.player.y = originalY;
             
             // Try moving only horizontally
             this.player.move(dx, 0);
-            if (this.player.checkTreeCollisions(this.trees) || this.player.checkStalactiteCollisions(this.stalactites)) {
+            if (this.player.checkTreeCollisions(this.trees) || this.player.checkStalactiteCollisions(this.stalactites) || this.player.checkHouseCollisions(this.houses) || this.player.checkWallCollisions(this.walls)) {
                 // Horizontal movement also collides, revert and try vertical only
                 this.player.x = originalX;
                 this.player.y = originalY;
                 this.player.move(0, dy);
                 
                 // If vertical also collides, stay in place
-                if (this.player.checkTreeCollisions(this.trees) || this.player.checkStalactiteCollisions(this.stalactites)) {
+                if (this.player.checkTreeCollisions(this.trees) || this.player.checkStalactiteCollisions(this.stalactites) || this.player.checkHouseCollisions(this.houses) || this.player.checkWallCollisions(this.walls)) {
                     this.player.x = originalX;
                     this.player.y = originalY;
                 }
@@ -424,13 +467,24 @@ class CrystalisGame {
     }
     
     updateCamera() {
-        // Center camera on player
-        this.camera.x = this.player.x - this.width / 2;
-        this.camera.y = this.player.y - this.height / 2;
+        // Check if level has custom camera behavior
+        const levelConfigs = this.currentLevelObj?.canvasConfigs || {};
         
-        // Clamp camera to world bounds
-        this.camera.x = Math.max(0, Math.min(this.camera.x, this.worldWidth - this.width));
-        this.camera.y = Math.max(0, Math.min(this.camera.y, this.worldHeight - this.height));
+        // If level canvas size matches world size, use fixed camera (like village)
+        if (levelConfigs.canvasWidth === levelConfigs.worldWidth && 
+            levelConfigs.canvasHeight === levelConfigs.worldHeight) {
+            // Fixed camera - show entire level
+            this.camera.x = 0;
+            this.camera.y = 0;
+        } else {
+            // Dynamic camera - center on player
+            this.camera.x = this.player.x - this.width / 2;
+            this.camera.y = this.player.y - this.height / 2;
+            
+            // Clamp camera to world bounds
+            this.camera.x = Math.max(0, Math.min(this.camera.x, this.worldWidth - this.width));
+            this.camera.y = Math.max(0, Math.min(this.camera.y, this.worldHeight - this.height));
+        }
     }
     
     render() {
@@ -447,6 +501,16 @@ class CrystalisGame {
         // Draw mountains (behind everything for proper layering)
         for (const mountain of this.mountains) {
             mountain.draw(this.ctx);
+        }
+        
+        // Draw houses (village buildings)
+        for (const house of this.houses) {
+            house.draw(this.ctx);
+        }
+        
+        // Draw walls (village borders)
+        for (const wall of this.walls) {
+            wall.draw(this.ctx);
         }
         
         // Draw trees (before other entities for proper layering)
@@ -528,22 +592,10 @@ class CrystalisGame {
     }
 
     drawBackground() {
-        // Different background colors for different levels
-        let backgroundColor, accentColor;
-        
-        switch(this.currentLevel) {
-            case 1: // Forest level
-                backgroundColor = '#2d5016'; // Forest green
-                accentColor = '#1a3009'; // Darker green
-                break;
-            case 2: // Cave level
-                backgroundColor = '#1a1a1a'; // Dark cave
-                accentColor = '#2a2a2a'; // Slightly lighter
-                break;
-            default:
-                backgroundColor = '#2d5016';
-                accentColor = '#1a3009';
-        }
+        // Get background colors from current level configuration
+        const backgroundConfigs = this.currentLevelObj?.backgroundConfigs || {};
+        let backgroundColor = backgroundConfigs.backgroundColor || '#2d5016'; // Default to forest green
+        let accentColor = backgroundConfigs.accentColor || '#1a3009'; // Default to darker green
         
         // Draw background
         this.ctx.fillStyle = backgroundColor;
