@@ -23,11 +23,82 @@ export class Enemy {
         const distance = Math.sqrt(dx * dx + dy * dy);
         
         if (distance > 0 && distance < 100) {
-            this.x += (dx / distance) * this.speed;
-            this.y += (dy / distance) * this.speed;
+            // Store original position for collision checking
+            const originalX = this.x;
+            const originalY = this.y;
+            
+            // Calculate movement
+            const moveX = (dx / distance) * this.speed;
+            const moveY = (dy / distance) * this.speed;
+            
+            this.x += moveX;
+            this.y += moveY;
+            
+            // Check tree collisions (will be called from game class)
+            this.originalX = originalX;
+            this.originalY = originalY;
+            this.attemptedMoveX = moveX;
+            this.attemptedMoveY = moveY;
         }
         
         this.updateAnimation();
+    }
+    
+    // Method to check collision with trees (called from game class)
+    checkTreeCollisions(trees) {
+        for (const tree of trees) {
+            if (tree.checkCollision(this.x, this.y, this.width, this.height)) {
+                return tree; // Return the colliding tree
+            }
+        }
+        return null; // No collision
+    }
+    
+    // Method to check collision with stalactites (called from game class)
+    checkStalactiteCollisions(stalactites) {
+        for (const stalactite of stalactites) {
+            if (stalactite.checkCollision(this.x, this.y, this.width, this.height)) {
+                return stalactite; // Return the colliding stalactite
+            }
+        }
+        return null; // No collision
+    }
+    
+    // Method to check collision with mountains (called from game class)
+    checkMountainCollisions(mountains) {
+        for (const mountain of mountains) {
+            if (mountain.checkEnemyCollision(this.x, this.y, this.width, this.height)) {
+                return mountain; // Return the colliding mountain
+            }
+        }
+        return null; // No collision
+    }
+    
+    // Method to revert position if collision occurs
+    revertMovement() {
+        if (this.originalX !== undefined && this.originalY !== undefined) {
+            this.x = this.originalX;
+            this.y = this.originalY;
+        }
+    }
+    
+    // Method to try alternative movement (horizontal or vertical only)
+    tryAlternativeMovement(trees, mountains = [], stalactites = []) {
+        // Try horizontal movement only
+        this.x = this.originalX + this.attemptedMoveX;
+        this.y = this.originalY;
+        
+        if (this.checkTreeCollisions(trees) || this.checkMountainCollisions(mountains) || this.checkStalactiteCollisions(stalactites)) {
+            // Horizontal failed, try vertical only
+            this.x = this.originalX;
+            this.y = this.originalY + this.attemptedMoveY;
+            
+            if (this.checkTreeCollisions(trees) || this.checkMountainCollisions(mountains) || this.checkStalactiteCollisions(stalactites)) {
+                // Both failed, stay in original position
+                this.x = this.originalX;
+                this.y = this.originalY;
+            }
+        }
     }
     
     updateAnimation() {
@@ -39,8 +110,40 @@ export class Enemy {
         }
     }
     
-    takeDamage(damage) {
+    takeDamage(damage, knockbackX = 0, knockbackY = 0) {
         this.hp -= damage;
+        
+        // Apply knockback if provided
+        if (knockbackX !== 0 || knockbackY !== 0) {
+            this.applyKnockback(knockbackX, knockbackY);
+        }
+    }
+    
+    applyKnockback(knockbackX, knockbackY) {
+        // Store original position for collision checking
+        const originalX = this.x;
+        const originalY = this.y;
+        
+        // Apply knockback movement
+        this.x += knockbackX;
+        this.y += knockbackY;
+        
+        // Keep enemy within world bounds
+        this.x = Math.max(0, Math.min(this.x, window.game.worldWidth - this.width));
+        this.y = Math.max(0, Math.min(this.y, window.game.worldHeight - this.height));
+        
+        // Check for collisions with obstacles and revert if necessary
+        if (window.game) {
+            const collidingTree = this.checkTreeCollisions(window.game.trees);
+            const collidingMountain = this.checkMountainCollisions(window.game.mountains);
+            const collidingStalactite = this.checkStalactiteCollisions(window.game.stalactites);
+            
+            if (collidingTree || collidingMountain || collidingStalactite) {
+                // Revert to original position if knockback causes collision
+                this.x = originalX;
+                this.y = originalY;
+            }
+        }
     }
     
     draw(ctx) {

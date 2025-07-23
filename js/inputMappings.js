@@ -1,23 +1,5 @@
 // inputMappings.js - Input key mappings and configurations for the game
 
-// Game control keys that should have default browser behavior prevented
-export const GAME_KEYS = [
-    'Space',
-    'KeyW',
-    'KeyA', 
-    'KeyS',
-    'KeyD',
-    'KeyQ',
-    'KeyE',
-    'KeyZ',
-    'KeyT',
-    'KeyH',
-    'ArrowUp',
-    'ArrowDown', 
-    'ArrowLeft',
-    'ArrowRight'
-];
-
 // Movement key mappings
 export const MOVEMENT_KEYS = {
     up: ['KeyW', 'ArrowUp'],
@@ -28,12 +10,14 @@ export const MOVEMENT_KEYS = {
 
 // Action key mappings
 export const ACTION_KEYS = {
-    attack: 'Space',
-    dash: 'KeyZ',
-    magic: 'KeyQ',
-    changeMagic: 'KeyE',
+    attack: 'KeyZ',
+    dash: 'ShiftLeft',
+    magic: 'KeyX',
+    changeMagic: 'KeyC',
     toggleEnemies: 'KeyT',
-    toggleInstructions: 'KeyH'
+    toggleInstructions: 'KeyH',
+    nextLevel: 'BracketRight',     // ] key
+    prevLevel: 'BracketLeft'       // [ key
 };
 
 // Input configuration
@@ -44,3 +28,10 @@ export const INPUT_CONFIG = {
     chargeRequiredTime: 1.5,
     chargeIndicatorDelay: 0.5
 };
+
+
+// Game control keys that should have default browser behavior prevented
+export const GAME_KEYS = [
+    ...Object.values(MOVEMENT_KEYS).flat(),
+    ...Object.values(ACTION_KEYS)
+];

@@ -5,6 +5,11 @@ import { SwordProjectile } from './Projectile.js';
 import { ExperienceOrb } from './Item.js';
 import { Effect, HitEffect, HealEffect, MeleeAttackEffect } from './Effect.js';
 import { GAME_KEYS, MOVEMENT_KEYS, ACTION_KEYS, INPUT_CONFIG } from './inputMappings.js';
+import { initializeLevel1 } from './levels/level-1.js';
+import { initializeLevel2 } from './levels/level-2.js';
+import Tree from './Tree.js';
+import Mountain from './Mountain.js';
+import Cave from './Cave.js';
 
 class CrystalisGame {
     constructor() {
@@ -27,6 +32,14 @@ class CrystalisGame {
         this.items = [];
         this.projectiles = [];
         this.effects = [];
+        this.trees = []; // Add trees array
+        this.mountains = []; // Add mountains array
+        this.caves = []; // Add caves array
+        this.stalactites = []; // Add stalactites array
+        
+        // Level management
+        this.currentLevel = 2;
+        this.maxLevel = 2;
         
         // Input handling
         this.keys = {};
@@ -41,7 +54,7 @@ class CrystalisGame {
         this.chargeIndicatorDelay = INPUT_CONFIG.chargeIndicatorDelay;
         
         // Initialize world
-        this.initializeFirstArea();
+        this.loadLevel(this.currentLevel);
         this.setupEventListeners();
         this.updateUI();
         
@@ -52,16 +65,35 @@ class CrystalisGame {
         this.gameLoop();
     }
     
-    initializeFirstArea() {
-        // Add some basic enemies in the starting area
-        this.enemies.push(new Slime(300, 300));
-        this.enemies.push(new Slime(200, 250));
-        this.enemies.push(new Ant(400, 350));
-        this.enemies.push(new Ant(150, 400));
+    loadLevel(levelNumber) {
+        // Reset player position to spawn point
+        this.player.x = 256;
+        this.player.y = 400;
         
-        // Add some items/experience orbs
-        this.items.push(new ExperienceOrb(180, 200, 5));
-        this.items.push(new ExperienceOrb(350, 280, 5));
+        // Load the specified level
+        switch(levelNumber) {
+            case 1:
+                initializeLevel1(this);
+                break;
+            case 2:
+                initializeLevel2(this);
+                break;
+            default:
+                console.warn(`Level ${levelNumber} not found, loading level 1`);
+                initializeLevel1(this);
+                this.currentLevel = 1;
+        }
+        
+        console.log(`Loaded Level ${this.currentLevel}`);
+    }
+    
+    switchLevel(direction) {
+        const newLevel = this.currentLevel + direction;
+        if (newLevel >= 1 && newLevel <= this.maxLevel) {
+            this.currentLevel = newLevel;
+            this.loadLevel(this.currentLevel);
+            this.updateUI();
+        }
     }
     
     setupEventListeners() {
@@ -120,6 +152,16 @@ class CrystalisGame {
                 window.toggleInstructions();
                 e.preventDefault();
             }
+            
+            if (e.code === ACTION_KEYS.nextLevel) {
+                this.switchLevel(1);
+                e.preventDefault();
+            }
+            
+            if (e.code === ACTION_KEYS.prevLevel) {
+                this.switchLevel(-1);
+                e.preventDefault();
+            }
         });
     }
     
@@ -132,6 +174,16 @@ class CrystalisGame {
         // Update player
         this.player.update();
         
+        // Check for cave opening portal activation
+        const portalMountain = this.player.checkCaveOpeningPortal(this.mountains);
+        if (portalMountain && portalMountain.caveOpeningDestination) {
+            console.log(`Entering portal to level ${portalMountain.caveOpeningDestination}`);
+            this.currentLevel = portalMountain.caveOpeningDestination;
+            this.loadLevel(this.currentLevel);
+            this.updateUI();
+            return; // Skip rest of update to avoid issues during level transition
+        }
+        
         // Update enemies
         for (let i = this.enemies.length - 1; i >= 0; i--) {
             const enemy = this.enemies[i];
@@ -139,6 +191,15 @@ class CrystalisGame {
             // Only update enemy movement if enabled
             if (this.enemiesCanMove) {
                 enemy.update(this.player);
+                
+                // Check for tree collisions and handle them
+                const collidingTree = enemy.checkTreeCollisions(this.trees);
+                const collidingMountain = enemy.checkMountainCollisions(this.mountains);
+                const collidingStalactite = enemy.checkStalactiteCollisions(this.stalactites);
+                
+                if (collidingTree || collidingMountain || collidingStalactite) {
+                    enemy.tryAlternativeMovement(this.trees, this.mountains, this.stalactites);
+                }
             } else {
                 // Still update animation even when frozen
                 enemy.updateAnimation();
@@ -193,8 +254,15 @@ class CrystalisGame {
     }
     
     handleInput() {
-        const speed = this.player.speed;
+        let speed = this.player.speed;
         let dx = 0, dy = 0;
+        
+        // Check if player is in a mountain or cave for speed reduction
+        const inMountain = this.player.checkMountainSlowdown(this.mountains);
+        const inCave = this.player.checkCaveSlowdown(this.caves);
+        if (inMountain || inCave) {
+            speed *= 0.4; // Reduce speed to 40% when in mountain or cave
+        }
         
         // Movement (8-directional) using key mappings
         if (MOVEMENT_KEYS.up.some(key => this.keys[key])) dy -= speed;
@@ -208,7 +276,37 @@ class CrystalisGame {
             dy *= 0.707;
         }
         
+        // Store player's current position
+        const originalX = this.player.x;
+        const originalY = this.player.y;
+        
+        // Try to move player
         this.player.move(dx, dy);
+        
+        // Check for tree collisions and revert if necessary
+        const collidingTree = this.player.checkTreeCollisions(this.trees);
+        const collidingStalactite = this.player.checkStalactiteCollisions(this.stalactites);
+        
+        if (collidingTree || collidingStalactite) {
+            // Revert to original position
+            this.player.x = originalX;
+            this.player.y = originalY;
+            
+            // Try moving only horizontally
+            this.player.move(dx, 0);
+            if (this.player.checkTreeCollisions(this.trees) || this.player.checkStalactiteCollisions(this.stalactites)) {
+                // Horizontal movement also collides, revert and try vertical only
+                this.player.x = originalX;
+                this.player.y = originalY;
+                this.player.move(0, dy);
+                
+                // If vertical also collides, stay in place
+                if (this.player.checkTreeCollisions(this.trees) || this.player.checkStalactiteCollisions(this.stalactites)) {
+                    this.player.x = originalX;
+                    this.player.y = originalY;
+                }
+            }
+        }
         
         // Dash
         if (this.keys[ACTION_KEYS.dash]) {
@@ -263,9 +361,19 @@ class CrystalisGame {
             
             // If enemy is within melee range
             if (distance <= meleeRange) {
-                enemy.takeDamage(this.player.attackPower);
+                // Calculate knockback direction (from player to enemy)
+                const knockbackStrength = 15; // pixels to knockback
+                const dx = (enemy.x + enemy.width / 2) - (this.player.x + this.player.width / 2);
+                const dy = (enemy.y + enemy.height / 2) - (this.player.y + this.player.height / 2);
+                const length = Math.sqrt(dx * dx + dy * dy);
+                
+                // Normalize and apply knockback
+                const knockbackX = length > 0 ? (dx / length) * knockbackStrength : 0;
+                const knockbackY = length > 0 ? (dy / length) * knockbackStrength : 0;
+                
+                enemy.takeDamage(this.player.attackPower, knockbackX, knockbackY);
                 this.effects.push(new HitEffect(enemy.x + enemy.width / 2, enemy.y + enemy.height / 2));
-                console.log('Melee hit enemy for', this.player.attackPower, 'damage');
+                console.log('Melee hit enemy for', this.player.attackPower, 'damage with knockback');
             }
         }
         
@@ -299,9 +407,15 @@ class CrystalisGame {
             if (projectile.friendly) {
                 for (const enemy of this.enemies) {
                     if (this.getDistance(projectile, enemy) < 20) {
-                        enemy.takeDamage(projectile.damage);
+                        // Calculate knockback direction (projectile direction)
+                        const knockbackStrength = 20; // Stronger knockback for projectiles
+                        const knockbackX = Math.cos(projectile.angle) * knockbackStrength;
+                        const knockbackY = Math.sin(projectile.angle) * knockbackStrength;
+                        
+                        enemy.takeDamage(projectile.damage, knockbackX, knockbackY);
                         projectile.shouldRemove = true;
                         this.effects.push(new HitEffect(enemy.x, enemy.y));
+                        console.log('Projectile hit enemy with knockback');
                         break;
                     }
                 }
@@ -329,6 +443,21 @@ class CrystalisGame {
         
         // Draw world background
         this.drawBackground();
+        
+        // Draw mountains (behind everything for proper layering)
+        for (const mountain of this.mountains) {
+            mountain.draw(this.ctx);
+        }
+        
+        // Draw trees (before other entities for proper layering)
+        for (const tree of this.trees) {
+            tree.draw(this.ctx);
+        }
+        
+        // Draw stalactites (cave decorations)
+        for (const stalactite of this.stalactites) {
+            stalactite.draw(this.ctx);
+        }
         
         // Draw items
         for (const item of this.items) {
@@ -399,12 +528,29 @@ class CrystalisGame {
     }
 
     drawBackground() {
-        // Draw a simple forest/grass background
-        this.ctx.fillStyle = '#2d5016';
+        // Different background colors for different levels
+        let backgroundColor, accentColor;
+        
+        switch(this.currentLevel) {
+            case 1: // Forest level
+                backgroundColor = '#2d5016'; // Forest green
+                accentColor = '#1a3009'; // Darker green
+                break;
+            case 2: // Cave level
+                backgroundColor = '#1a1a1a'; // Dark cave
+                accentColor = '#2a2a2a'; // Slightly lighter
+                break;
+            default:
+                backgroundColor = '#2d5016';
+                accentColor = '#1a3009';
+        }
+        
+        // Draw background
+        this.ctx.fillStyle = backgroundColor;
         this.ctx.fillRect(0, 0, this.worldWidth, this.worldHeight);
         
         // Add some simple terrain details
-        this.ctx.fillStyle = '#1a3009';
+        this.ctx.fillStyle = accentColor;
         for (let x = 0; x < this.worldWidth; x += 64) {
             for (let y = 0; y < this.worldHeight; y += 64) {
                 if ((x + y) % 128 === 0) {
@@ -416,6 +562,7 @@ class CrystalisGame {
     
     updateUI() {
         document.getElementById('level').textContent = this.player.level;
+        document.getElementById('currentArea').textContent = this.currentLevel;
         document.getElementById('hp').textContent = this.player.hp;
         document.getElementById('maxHp').textContent = this.player.maxHp;
         document.getElementById('mp').textContent = this.player.mp;

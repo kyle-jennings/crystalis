@@ -36,6 +36,11 @@ export default class Player {
         this.dashSpeed = 8; // Dash speed multiplier
         this.dashCooldown = 0;
         this.dashCooldownTime = 1.0; // 1 second cooldown
+        this.dashCharges = 2; // Number of dashes available
+        this.maxDashCharges = 2; // Maximum dash charges
+        this.dashChargeRegenTime = 1.0; // Time to regenerate one dash charge
+        this.dashChargeFlash = false; // Flash effect when charge is regenerated
+        this.dashChargeFlashTime = 0; // Duration of flash effect
         
         // Animation
         this.animFrame = 0;
@@ -64,6 +69,10 @@ export default class Player {
             }
         }
         
+        // Store original position for collision checking
+        const originalX = this.x;
+        const originalY = this.y;
+        
         // Move player
         this.x += dx;
         this.y += dy;
@@ -71,6 +80,56 @@ export default class Player {
         // Keep player in world bounds
         this.x = Math.max(8, Math.min(this.x, 1016));
         this.y = Math.max(8, Math.min(this.y, 760));
+    }
+    
+    // Method to check collision with trees (called from game class)
+    checkTreeCollisions(trees) {
+        for (const tree of trees) {
+            if (tree.checkCollision(this.x, this.y, this.width, this.height)) {
+                return tree; // Return the colliding tree
+            }
+        }
+        return null; // No collision
+    }
+    
+    // Method to check collision with stalactites (called from game class)
+    checkStalactiteCollisions(stalactites) {
+        for (const stalactite of stalactites) {
+            if (stalactite.checkCollision(this.x, this.y, this.width, this.height)) {
+                return stalactite; // Return the colliding stalactite
+            }
+        }
+        return null; // No collision
+    }
+    
+    // Method to check if player is inside mountains (called from game class)
+    checkMountainSlowdown(mountains) {
+        for (const mountain of mountains) {
+            if (mountain.checkPlayerInside(this.x, this.y, this.width, this.height)) {
+                return mountain; // Return the mountain player is inside
+            }
+        }
+        return null; // Not in any mountain
+    }
+    
+    // Method to check if player is inside caves (called from game class)
+    checkCaveSlowdown(caves) {
+        for (const cave of caves) {
+            if (cave.checkPlayerInside && cave.checkPlayerInside(this.x, this.y, this.width, this.height)) {
+                return cave; // Return the cave player is inside
+            }
+        }
+        return null; // Not in any cave
+    }
+    
+    // Method to check if player is in a cave opening portal (called from game class)
+    checkCaveOpeningPortal(mountains) {
+        for (const mountain of mountains) {
+            if (mountain.hasCaveOpening && mountain.checkPlayerInCaveOpening(this.x, this.y, this.width, this.height)) {
+                return mountain; // Return the mountain with cave opening
+            }
+        }
+        return null; // Not in any cave opening
     }
     
     attack() {
@@ -90,11 +149,16 @@ export default class Player {
     }
     
     dash() {
-        // Can only dash if not already dashing and cooldown is over
-        if (!this.isDashing && this.dashCooldown <= 0) {
+        // Can only dash if not already dashing and has charges available
+        if (!this.isDashing && this.dashCharges > 0) {
             this.isDashing = true;
             this.dashTime = this.dashDuration;
-            this.dashCooldown = this.dashCooldownTime;
+            this.dashCharges--; // Use one dash charge
+            
+            // Start cooldown timer if we just used the last charge
+            if (this.dashCharges === 0) {
+                this.dashCooldown = this.dashChargeRegenTime;
+            }
             
             // Make player invincible during dash
             this.dashInvulnerable = true;
@@ -175,6 +239,28 @@ export default class Player {
         // Update dash cooldown
         if (this.dashCooldown > 0) {
             this.dashCooldown -= 1/60;
+            
+            // Regenerate dash charges when cooldown expires
+            if (this.dashCooldown <= 0 && this.dashCharges < this.maxDashCharges) {
+                this.dashCharges++;
+                
+                // Trigger flash effect when charge is regenerated
+                this.dashChargeFlash = true;
+                this.dashChargeFlashTime = 0.5; // Flash for 0.5 seconds
+                
+                // If we still need more charges, start the timer again
+                if (this.dashCharges < this.maxDashCharges) {
+                    this.dashCooldown = this.dashChargeRegenTime;
+                }
+            }
+        }
+        
+        // Update dash charge flash effect
+        if (this.dashChargeFlash) {
+            this.dashChargeFlashTime -= 1/60;
+            if (this.dashChargeFlashTime <= 0) {
+                this.dashChargeFlash = false;
+            }
         }
         
         // Update attack animation
@@ -207,6 +293,12 @@ export default class Player {
             ctx.globalAlpha = 0.5;
         }
         
+        // Check if player is in mountain for visual feedback
+        let inMountain = false;
+        if (window.game && window.game.mountains) {
+            inMountain = this.checkMountainSlowdown(window.game.mountains) !== null;
+        }
+        
         // Dash effect - make player semi-transparent and add motion blur
         if (this.isDashing) {
             ctx.globalAlpha *= 0.7;
@@ -224,6 +316,19 @@ export default class Player {
                 ctx.shadowColor = '#00FFFF';
                 ctx.shadowBlur = 10;
             }
+        }
+        
+        // Flash effect when dash charge is regenerated
+        if (this.dashChargeFlash) {
+            ctx.shadowColor = '#00FFFF';
+            ctx.shadowBlur = 10;
+        }
+        
+        // Mountain slowdown visual effect
+        if (inMountain && !this.isDashing) {
+            ctx.globalAlpha *= 0.8; // Slightly transparent
+            ctx.shadowColor = '#8B4513'; // Brown mountain color
+            ctx.shadowBlur = 5;
         }
         
         // Draw player (simple colored rectangle for now)
