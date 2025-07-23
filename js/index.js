@@ -9,6 +9,7 @@ import {
     HealEffect,
     MeleeAttackEffect } from './classes/Effect.js';
 import { GAME_KEYS, MOVEMENT_KEYS, ACTION_KEYS, INPUT_CONFIG } from './inputMappings.js';
+import DevMode from './classes/DevMode.js';
 
 // Import all level modules as objects
 import * as Level1 from './levels/level-1.js';
@@ -34,6 +35,7 @@ class CrystalisGame {
         this.currentLevel = 1;
         this.maxLevel = 3;
         this.currentLevelObj = null; // Will hold the active level module
+        this.devMode = new DevMode(this); // Developer mode instance
 
         this.gameTime = 0;
         this.camera = { x: 0, y: 0 };
@@ -68,16 +70,19 @@ class CrystalisGame {
         this.chargeRequiredTime = INPUT_CONFIG.chargeRequiredTime;
         this.chargeIndicatorDelay = INPUT_CONFIG.chargeIndicatorDelay;
         
-        // Initialize world
-        this.loadLevel(this.currentLevel);
-        this.setupEventListeners();
-        this.updateUI();
-        
-        // Make game instance globally accessible for button
-        window.game = this;
-        
-        // Start game loop
-        this.gameLoop();
+        // Check for dev mode before initializing
+        this.devMode.initialize().then(() => {
+            // Initialize world
+            this.loadLevel(this.currentLevel);
+            this.setupEventListeners();
+            this.updateUI();
+            
+            // Make game instance globally accessible for button
+            window.game = this;
+            
+            // Start game loop
+            this.gameLoop();
+        });
     }
     
     loadLevel(levelNumber) {
@@ -201,6 +206,14 @@ class CrystalisGame {
                 this.switchLevel(-1);
                 e.preventDefault();
             }
+            
+            // Dev mode specific controls
+            if (this.devMode.enabled) {
+                const handled = this.devMode.handleKeyInput(e.code);
+                if (handled) {
+                    e.preventDefault();
+                }
+            }
         });
     }
     
@@ -321,8 +334,8 @@ class CrystalisGame {
         const originalX = this.player.x;
         const originalY = this.player.y;
         
-        // Try to move player
-        this.player.move(dx, dy);
+        // Try to move player with current world boundaries
+        this.player.move(dx, dy, this.worldWidth, this.worldHeight);
         
         // Check for tree collisions and revert if necessary
         const collidingTree = this.player.checkTreeCollisions(this.trees);
@@ -336,12 +349,12 @@ class CrystalisGame {
             this.player.y = originalY;
             
             // Try moving only horizontally
-            this.player.move(dx, 0);
+            this.player.move(dx, 0, this.worldWidth, this.worldHeight);
             if (this.player.checkTreeCollisions(this.trees) || this.player.checkStalactiteCollisions(this.stalactites) || this.player.checkHouseCollisions(this.houses) || this.player.checkWallCollisions(this.walls)) {
                 // Horizontal movement also collides, revert and try vertical only
                 this.player.x = originalX;
                 this.player.y = originalY;
-                this.player.move(0, dy);
+                this.player.move(0, dy, this.worldWidth, this.worldHeight);
                 
                 // If vertical also collides, stay in place
                 if (this.player.checkTreeCollisions(this.trees) || this.player.checkStalactiteCollisions(this.stalactites) || this.player.checkHouseCollisions(this.houses) || this.player.checkWallCollisions(this.walls)) {
@@ -656,6 +669,12 @@ class CrystalisGame {
     gameLoop() {
         this.update();
         this.render();
+        
+        // Update dev panel if dev mode is enabled
+        if (this.devMode.enabled) {
+            this.devMode.updateDevPanel();
+        }
+        
         requestAnimationFrame(() => this.gameLoop());
     }
 }

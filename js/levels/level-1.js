@@ -1,4 +1,4 @@
-// Level 3 - Village Area (Safe Zone)
+// Village Area (Safe Zone)
 import Tree from '../classes/Tree.js';
 import House from '../classes/House.js';
 import Wall from '../classes/Wall.js';
@@ -19,7 +19,7 @@ export const canvasConfigs = {
   playerY: 283, // Center vertically
 }
 
-// Level 3 background configuration
+//  background configuration
 export const backgroundConfigs = {
     backgroundColor: '#8B4513', // Sandy brown
     accentColor: '#A0522D', // Sienna brown

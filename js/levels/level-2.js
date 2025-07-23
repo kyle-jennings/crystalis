@@ -1,22 +1,22 @@
-// Level 1 - First Area
+// First Area
 import { Slime, Ant } from '../classes/Enemy.js';
 import { ExperienceOrb } from '../classes/Item.js';
 import Tree from '../classes/Tree.js';
 import Mountain from '../classes/Mountain.js';
 
-// Level 1 canvas configuration (default size)
+// canvas configuration (default size)
 export const canvasConfigs = {
-    canvasWidth: 512,
-    canvasHeight: 480,
-    width: 512,
-    height: 480,
+    canvasWidth: 540,
+    canvasHeight: 566,
+    width: 540,
+    height: 566,
     worldWidth: 1024,
     worldHeight: 768,
     playerX: 256,
     playerY: 400
 };
 
-// Level 1 background configuration
+// background configuration
 export const backgroundConfigs = {
     backgroundColor: '#2d5016', // Forest green
     accentColor: '#1a3009', // Darker green

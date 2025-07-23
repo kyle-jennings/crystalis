@@ -1,22 +1,22 @@
-// Level 2 - Cave Area
+// Cave Area
 import { Slime, Ant } from '../classes/Enemy.js';
 import { ExperienceOrb } from '../classes/Item.js';
 import Mountain from '../classes/Mountain.js';
 import Stalactite from '../classes/Stalactite.js';
 
-// Level 2 canvas configuration (default size)
+// canvas configuration (default size)
 export const canvasConfigs = {
-    canvasWidth: 512,
-    canvasHeight: 480,
-    width: 512,
-    height: 480,
+    canvasWidth: 540,
+    canvasHeight: 566,
+    width: 540,
+    height: 566,
     worldWidth: 1024,
     worldHeight: 768,
     playerX: 256,
     playerY: 400
 };
 
-// Level 2 background configuration
+// background configuration
 export const backgroundConfigs = {
     backgroundColor: '#1a1a1a', // Dark cave
     accentColor: '#2a2a2a', // Slightly lighter

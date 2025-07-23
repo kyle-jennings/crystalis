@@ -48,7 +48,7 @@ export default class Player {
         this.isMoving = false;
     }
     
-    move(dx, dy) {
+    move(dx, dy, worldWidth = 1024, worldHeight = 768) {
         // If dashing, override movement with dash movement
         if (this.isDashing) {
             dx = this.dashDirection.x * this.dashSpeed;
@@ -77,9 +77,9 @@ export default class Player {
         this.x += dx;
         this.y += dy;
         
-        // Keep player in world bounds
-        this.x = Math.max(8, Math.min(this.x, 1016));
-        this.y = Math.max(8, Math.min(this.y, 760));
+        // Keep player in world bounds (dynamically based on current level)
+        this.x = Math.max(8, Math.min(this.x, worldWidth - this.width - 8));
+        this.y = Math.max(8, Math.min(this.y, worldHeight - this.height - 8));
     }
     
     // Method to check collision with trees (called from game class)
