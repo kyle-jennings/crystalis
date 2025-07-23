@@ -362,7 +362,7 @@ class CrystalisGame {
             // If enemy is within melee range
             if (distance <= meleeRange) {
                 // Calculate knockback direction (from player to enemy)
-                const knockbackStrength = 15; // pixels to knockback
+                const knockbackStrength = 50; // pixels to knockback - increased from 15
                 const dx = (enemy.x + enemy.width / 2) - (this.player.x + this.player.width / 2);
                 const dy = (enemy.y + enemy.height / 2) - (this.player.y + this.player.height / 2);
                 const length = Math.sqrt(dx * dx + dy * dy);
@@ -408,7 +408,7 @@ class CrystalisGame {
                 for (const enemy of this.enemies) {
                     if (this.getDistance(projectile, enemy) < 20) {
                         // Calculate knockback direction (projectile direction)
-                        const knockbackStrength = 20; // Stronger knockback for projectiles
+                        const knockbackStrength = 35; // Stronger knockback for projectiles - increased from 20
                         const knockbackX = Math.cos(projectile.angle) * knockbackStrength;
                         const knockbackY = Math.sin(projectile.angle) * knockbackStrength;
                         
