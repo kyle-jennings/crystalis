@@ -52,7 +52,7 @@ module.exports = {
     '**/vendor/*.js',
     '**/node_modules/**/*',
     '**/dist',
-    './src/components/GameCanvas/js/**/*',
-    'src/components/GameCanvas/js/**/*',
+    './src/components/GameCanvas/lib/**/*',
+    'src/components/GameCanvas/lib/**/*',
   ],
 };

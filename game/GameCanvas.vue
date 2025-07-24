@@ -2,8 +2,8 @@
 import {
   onMounted,
 } from 'vue';
-import './lib/css/styles.css';
-import './lib/js/index.js';
+import './css/styles.css';
+import './js/index.js';
 // import { CrystalisGame } from './js/index.js';
 
 onMounted(() => {
