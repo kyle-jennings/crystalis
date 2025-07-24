@@ -3,84 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crystalis Clone - First Area</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="dev.css">
-    <script>
-        // Function to toggle instructions visibility
-        function toggleInstructions() {
-            const content = document.getElementById('instructionsContent');
-            const toggle = document.getElementById('instructionsToggle');
-            
-            content.classList.toggle('collapsed');
-            toggle.classList.toggle('collapsed');
-        }
-        
-        // Make toggle function globally accessible
-        window.toggleInstructions = toggleInstructions;
-    </script>
+    <title>Crystalis Clone - Vue App</title>
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
 </head>
 <body>
-    <div id="devPanel" style="display: none;">
-        <div class="dev-mode-indicator">
-            DEV MODE
-        </div>
-    
-        <div class="buttons">
-
-            <button id="toggleEnemiesBtn" onclick="window.game.toggleEnemyMovement()">
-                Freeze Enemies
-            </button>1
-        </div>
-    </div>
-    <div id="mainFlexWrapper">
-        <div id="gameContainer">
-            <canvas id="gameCanvas" width="512" height="480"></canvas>
-            
-            <div id="ui">
-                <div class="stat">Level: <span id="level">1</span></div>
-                <div class="stat">Area: <span id="currentArea">1</span></div>
-                <div class="stat">HP: <span id="hp">16</span>/<span id="maxHp">16</span></div>
-                <div class="hp-bar">
-                    <div class="hp-fill" id="hpFill"></div>
-                </div>
-                <div class="stat">MP: <span id="mp">4</span>/<span id="maxMp">4</span></div>
-                <div class="mp-bar">
-                    <div class="mp-fill" id="mpFill"></div>
-                </div>
-                <div class="stat">EXP: <span id="exp">0</span></div>
-                <div class="stat">Sword: <span id="currentSword">Wind</span></div>
-            </div>
-            
-            <div id="instructions">
-                <div
-                    id="instructionsHeader"
-                    class="collapsed"
-                    onclick="toggleInstructions()"
-                >
-                    <span id="instructionsToggle">▼</span>
-                    <span>Controls (Click to toggle, or press H)</span>
-                </div>
-                <div id="instructionsContent" class="collapsed">
-                    <div class="controls">WASD/Arrows: Move</div>
-                    <div class="controls">Z: Attack (Hold to charge)</div>
-                    <div class="controls">Shift: Dash</div>
-                    <div class="controls">X: Magic/Heal</div>
-                    <div class="controls">T: Toggle Enemy Movement</div>
-                    <div class="controls">[ / ] : Switch Levels</div>
-                    <div class="controls">H: Toggle Instructions</div>
-                    <div id="devControls" style="margin-top: 10px; border-top: 1px solid #666; padding-top: 5px; display: none;">
-                        <div class="controls" style="color: #ff4444;">Dev Mode Controls:</div>
-                        <div class="controls" style="color: #ff4444;">G: Toggle God Mode</div>
-                        <div class="controls" style="color: #ff4444;">L: Log Level Debug Info</div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-    
-    <script type="module" src="./js/index.js"></script>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
 </body>
 </html>

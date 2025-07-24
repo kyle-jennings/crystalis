@@ -1,0 +1,12 @@
+$fa-font-path : '@fortawesome/fontawesome-free/webfonts';
+@import "@fortawesome/fontawesome-free/scss/fontawesome.scss";
+@import "@fortawesome/fontawesome-free/scss/regular.scss";
+@import "@fortawesome/fontawesome-free/scss/solid.scss";
+
+@import 'bulmaswatch/slate/variables.scss';
+@import 'bulma-scss/bulma.scss';
+@import 'bulmaswatch/slate/overrides';
+@import 'buefy/src/scss/buefy.scss';
+
+// components
+@import './components/tab-content.scss';

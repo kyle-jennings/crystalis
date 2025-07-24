@@ -24,7 +24,7 @@ const LEVELS = {
 };
 
 
-class CrystalisGame {
+export class CrystalisGame {
     constructor() {
         this.canvas = document.getElementById('gameCanvas');
         this.ctx = this.canvas.getContext('2d');
@@ -667,8 +667,21 @@ class CrystalisGame {
     }
     
     gameLoop() {
-        this.update();
+        // Normal game update only if not in editor mode
+        if (!this.devMode.editorMode) {
+            this.update();
+        } else {
+            // Limited update for editor (no player movement, frozen enemies)
+            this.updateEditor();
+        }
+        
         this.render();
+        
+        // Render editor if active
+        if (this.devMode.editorMode && this.devMode.levelEditor) {
+            this.devMode.levelEditor.updateEditorCamera();
+            this.devMode.levelEditor.renderEditor();
+        }
         
         // Update dev panel if dev mode is enabled
         if (this.devMode.enabled) {
@@ -677,9 +690,30 @@ class CrystalisGame {
         
         requestAnimationFrame(() => this.gameLoop());
     }
+
+    updateEditor() {
+        // Only update essential systems for editor
+        this.gameTime += 1/60;
+        
+        // Update camera for editor (could be independent of game camera)
+        this.updateCamera();
+        
+        // Update items (for visual feedback)
+        this.items.forEach(item => item.update());
+        
+        // Update effects (so they can finish and be removed)
+        for (let i = this.effects.length - 1; i >= 0; i--) {
+            const effect = this.effects[i];
+            effect.update();
+            
+            if (effect.shouldRemove) {
+                this.effects.splice(i, 1);
+            }
+        }
+    }
 }
 
 // Start the game when page loads
 window.addEventListener('load', () => {
-    new CrystalisGame();
+    window.CrystalisGame = new CrystalisGame();
 });

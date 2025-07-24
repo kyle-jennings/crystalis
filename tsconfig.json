@@ -1,0 +1,70 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "target": "esnext",
+    "module": "esnext",
+    "strict": true,
+    "jsx": "preserve",
+    "moduleResolution": "node",
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "useDefineForClassFields": true,
+    "sourceMap": true,
+    "experimentalDecorators": true,
+    "noImplicitThis": false,
+    "noImplicitReturns": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "resolveJsonModule": true,
+
+    "types": [
+      "webpack-env"
+    ],
+    "lib": [
+      "esnext",
+      "dom",
+      "dom.iterable",
+      "scripthost"
+    ],
+    "typeRoots": [
+      "@types",
+      "node_modules/@types",
+      "node_modules/**/@types",
+      "apps/types",
+      "apps/**/*/types",
+      "apps/admin/src/types",
+      "apps/learner/src/types",
+      "apps/ui-components/src/types"
+    ],
+    "paths": {
+      "@/*": ["apps/*"],
+      "@shared/*": ["apps/shared/*"],
+      "@admin/*": ["apps/admin/src/*"],
+      "@learner/*": ["apps/learner/src/*"],
+      "@components/*": ["apps/ui-components/src/components/*"],
+      "@components-src/*": ["apps/ui-components/src/*"],
+    },
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.vue",
+    "**/*.json",
+    "**/*.js",
+  ],
+  "exclude": [
+    "node_modules",
+    "ts-exclude",
+    "**/*/backup",
+    "apps/ui-components/src/components/Table/helpers.js",
+    "temp.js",
+    "**/vendor/*.js",
+    "**/node_modules/**/*",
+    "apps/ui-components/src/stories/**/*",
+    "apps/ui-components/src/pages/**/*",
+    "**/dist",
+    "apps/ui-components/**/*",
+  ]
+}

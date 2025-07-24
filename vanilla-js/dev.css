@@ -1,0 +1,88 @@
+#devPanel {
+  background-color: #222;
+  border: 3px solid #666;
+  border-radius: 8px;
+  min-height: 400px;
+  position: relative;
+}
+
+.dev-mode-indicator {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #ff4444;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    font-weight: bold;
+    z-index: 1000;
+    border: 2px solid #cc0000;
+}
+
+
+/* Dev Panel Tab Styles */
+.dev-tabs {
+    display: flex;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #555;
+}
+
+.dev-tab {
+    padding: 8px 16px;
+    background: #333;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px 4px 0 0;
+    margin-right: 2px;
+    transition: background 0.2s;
+}
+
+.dev-tab:hover {
+  background: #444;
+}
+
+.dev-tab.active {
+  background: #555;
+}
+
+/* Level Editor Styles */
+.editor-title {
+    margin: 0 0 10px 0;
+    color: #44ff44;
+}
+
+.editor-tool-label {
+    margin-bottom: 10px;
+}
+
+.object-palette {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 5px;
+    margin: 10px 0;
+}
+
+.editor-actions {
+    margin-top: 10px;
+}
+
+.export-button {
+    padding: 8px 12px;
+    background: #0066cc;
+    color: white;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+}
+
+.export-button:hover {
+    background: #0088ff;
+}
+
+.editor-instructions {
+    margin-top: 10px;
+    font-size: 10px;
+}

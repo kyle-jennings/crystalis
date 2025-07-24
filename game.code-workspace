@@ -1,0 +1,38 @@
+{
+	"folders": [
+		{
+			"name": "root",
+			"path": "."
+		},
+		{
+			"name": "Buefy",
+			"path": "node_modules/buefy/src"
+		},
+		{
+			"name": "Bulma",
+			"path": "node_modules/bulma-scss"
+		},
+		{
+			"name": "Bulmaswatch",
+			"path": "node_modules/bulmaswatch"
+		},
+		{
+			"name": "old work",
+			"path": "./vanilla-js"
+		}
+	],
+	"settings": {
+		"editor.codeActionsOnSave": {
+			"source.fixAll.eslint": "explicit"
+		},
+		"eslint.validate": ["javascript"],
+		"editor.rulers": [ 120 ],
+		"editor.tabSize": 2,
+		"files.exclude": {
+			"**/.git": true,
+			"**/.DS_Store": true,
+			"**/node_modules": true,
+			"vanilla-js": true
+		}
+	},
+}
