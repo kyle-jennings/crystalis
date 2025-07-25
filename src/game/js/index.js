@@ -4,7 +4,7 @@
 import Player from './classes/Player.js';
 // import { Enemy, Slime, Ant } from './classes/Enemy.js';
 import { SwordProjectile } from './classes/Projectile.js';
-import { ExperienceOrb } from './classes/Item.js';
+import ExperienceOrb from '@game/js/classes/ExperienceOrb.js';
 import {
   // Effect,
   HitEffect,
@@ -13,8 +13,7 @@ import {
 } from './classes/Effect.js';
 import {
   GAME_KEYS, MOVEMENT_KEYS, ACTION_KEYS, INPUT_CONFIG,
-} from './inputMappings.js';
-import LevelEditor from './dev/LevelEditor.js';
+} from './lib/inputMappings.js';
 
 // Import all level modules as objects
 import * as Level1 from './levels/level-1.js';
@@ -39,7 +38,6 @@ class CrystalisGame {
     this.currentLevel = 1;
     this.maxLevel = 3;
     this.currentLevelObj = null; // Will hold the active level module
-    this.levelEditor = new LevelEditor(this);
     this.gameTime = 0;
     this.camera = { x: 0, y: 0 };
     this.worldWidth = 1024;
@@ -84,7 +82,6 @@ class CrystalisGame {
     // Start game loop
     this.gameLoop();
 
-    this.levelEditor.initialize();
   }
 
   loadLevel(levelNumber) {
@@ -673,21 +670,22 @@ class CrystalisGame {
   }
 
   gameLoop() {
-    // Normal game update only if not in editor mode
-    if (!this.levelEditor.enabled) {
-      this.update();
-    } else {
-      // Limited update for editor (no player movement, frozen enemies)
-      this.updateEditor();
-    }
+    this.update();
+    // // Normal game update only if not in editor mode
+    // if (!this.levelEditor.enabled) {
+    //     this.update();
+    // } else {
+    //   // Limited update for editor (no player movement, frozen enemies)
+    // }
+    // this.updateEditor();
 
     this.render();
 
     // Render editor if active
-    if (this.levelEditor.enabled && this.levelEditor) {
-      this.levelEditor.updateEditorCamera();
-      this.levelEditor.renderEditor();
-    }
+    // if (this.levelEditor.enabled && this.levelEditor) {
+    //   this.levelEditor.updateEditorCamera();
+    //   this.levelEditor.renderEditor();
+    // }
 
     // Update dev panel if dev mode is enabled
     // if (this.levMode.enabled) {

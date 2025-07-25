@@ -54,5 +54,7 @@ module.exports = {
     '**/dist',
     './src/components/GameCanvas/lib/**/*',
     'src/components/GameCanvas/lib/**/*',
+    './src/game/**/*',
+    'src/game/**/*',
   ],
 };

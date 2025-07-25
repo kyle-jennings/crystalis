@@ -1,6 +1,6 @@
 // Cave Area
 import { Slime, Ant } from '../classes/Enemy.js';
-import { ExperienceOrb } from '../classes/Item.js';
+import ExperienceOrb from '@game/js/classes/ExperienceOrb.js';
 import Mountain from '../classes/Mountain.js';
 import Stalactite from '../classes/Stalactite.js';
 

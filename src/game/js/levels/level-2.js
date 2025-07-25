@@ -1,6 +1,6 @@
 // First Area
 import { Slime, Ant } from '../classes/Enemy.js';
-import { ExperienceOrb } from '../classes/Item.js';
+import ExperienceOrb from '@game/js/classes/ExperienceOrb.js';
 import Tree from '../classes/Tree.js';
 import Mountain from '../classes/Mountain.js';
 

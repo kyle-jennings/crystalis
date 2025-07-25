@@ -1,7 +1,12 @@
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import eslint from 'vite-plugin-eslint';
+import path from 'path';
 import copyGameCanvas from './build-lib/build-game.js';
+
+const root = path.resolve(__dirname);
+const src = path.resolve(root, 'src');
+const gameRoot = path.resolve(root, 'src', 'game');
 
 export default defineConfig({
   plugins: [
@@ -33,9 +38,11 @@ export default defineConfig({
     port: 8000,
     open: true,
   },
-  // resolve: {
-  //   alias: {
-  //     '@': path.resolve(root, 'src'),
-  //   },
-  // },
+  resolve: {
+    alias: {
+      '@': src,
+      '@game': gameRoot,
+      '@types': path.resolve(root, 'types'),
+    },
+  },
 });

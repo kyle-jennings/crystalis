@@ -1,7 +1,7 @@
 <script>
 import { ref } from 'vue';
-import DevPanel from './components/DevPanel.vue';
-import GameCanvas from './components/GameCanvas/GameCanvas.vue';
+import DevPanel from '@/components/DevPanel.vue';
+import GameCanvas from '@/components/GameCanvas.vue';
 
 export default {
   name: 'App',

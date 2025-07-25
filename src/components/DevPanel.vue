@@ -6,185 +6,22 @@ import {
   onMounted,
   nextTick,
 } from 'vue';
-import '../../types/interfaces';
+import '@types/interfaces';
+import GameEnrionmentObjects from '@game/js/lib/objectMappings';
+import useLevelEditor from '@/composables/useLevelEditor';
 
-const selectedTool = ref('tree'); // Track the currently selected tool
+console.log(GameEnrionmentObjects);
+const selectedObject = ref<any>(null); // Store reference to currently selected object
 const toolPreviewCanvas = ref<HTMLCanvasElement>();
 const formValues = ref<Record<string, any>>({}); // Store form input values
-const selectedObject = ref<any>(null); // Store reference to currently selected object
 
-// Computed property to get tool information
-const currentTool = computed(() => {
-  const tools: Record<string, Tool> = {
-    tree: {
-      name: 'Tree',
-      color: '#228B22',
-      args: [
-        {
-          name: 'x',
-          type: 'number',
-          required: true,
-        },
-        {
-          name: 'y',
-          type: 'number',
-          required: true,
-        },
-      ],
-    },
-    mountain: {
-      name: 'Mountain',
-      color: '#8B4513',
-      args: [
-        {
-          name: 'x',
-          type: 'number',
-          required: true,
-        },
-        {
-          name: 'y',
-          type: 'number',
-          required: true,
-        },
-        {
-          name: 'hasCaveOpening',
-          type: 'boolean',
-          default: false,
-          required: false,
-        },
-        {
-          name: 'caveOpeningDestination',
-          type: 'number',
-          default: null,
-          required: false,
-        },
-      ],
-    },
-    house: {
-      name: 'House',
-      color: '#CD853F',
-      args: [
-        {
-          name: 'x',
-          type: 'number',
-          required: true,
-        },
-        {
-          name: 'y',
-          type: 'number',
-          required: true,
-        },
-        {
-          name: 'style',
-          type: 'select',
-          default: 'normal',
-          required: false,
-          options: ['normal', 'shop', 'inn', 'temple'],
-        },
-      ],
-    },
-    wall: {
-      name: 'Wall',
-      color: '#696969',
-      args: [
-        {
-          name: 'x',
-          type: 'number',
-          required: true,
-        },
-        {
-          name: 'y',
-          type: 'number',
-          required: true,
-        },
-        {
-          name: 'width',
-          type: 'number',
-          required: true,
-        },
-        {
-          name: 'height',
-          type: 'number',
-          required: true,
-        },
-        {
-          name: 'isOpening',
-          type: 'boolean',
-          default: false,
-          required: false,
-        },
-      ],
-    },
-    entry: {
-      name: 'Level Entry',
-      color: '#00ff00',
-      args: [
-        {
-          name: 'x',
-          type: 'number',
-          required: true,
-        },
-        {
-          name: 'y',
-          type: 'number',
-          required: true,
-        },
-        {
-          name: 'width',
-          type: 'number',
-          default: 32,
-          required: false,
-        },
-        {
-          name: 'height',
-          type: 'number',
-          default: 32,
-          required: false,
-        },
-        {
-          name: 'destinationLevel',
-          type: 'number',
-          default: 1,
-          required: false,
-        },
-        {
-          name: 'destinationX',
-          type: 'number',
-          default: null,
-          required: false,
-        },
-        {
-          name: 'destinationY',
-          type: 'number',
-          default: null,
-          required: false,
-        },
-      ],
-    },
-    item: {
-      name: 'Experience Orb',
-      color: '#FFD700',
-      args: [
-        {
-          name: 'x',
-          type: 'number',
-          required: true,
-        },
-        {
-          name: 'y',
-          type: 'number',
-          required: true,
-        },
-        {
-          name: 'value',
-          type: 'number',
-          required: true,
-        },
-      ],
-    },
-  };
-  return tools[selectedTool.value] || tools.tree;
-});
+// Get game instance from window - this would ideally be passed as a prop
+const { game } = window as any;
+const levelEditor = useLevelEditor(game);
+
+// Use the level editor's selected tool
+const { selectedTool } = levelEditor;
+const { currentTool } = levelEditor;
 
 // Computed property to check if we have a selected object
 const hasSelectedObject = computed(() => selectedObject.value !== null);
@@ -382,8 +219,7 @@ const objectPaletteChange = (event: Event) => {
     // Clear selected object when manually changing tools
     selectedObject.value = null;
 
-    selectedTool.value = key; // Update the reactive reference
-    window.game.levelEditor?.setSelectedTool(key);
+    levelEditor.setSelectedTool(key);
   }
 };
 </script>

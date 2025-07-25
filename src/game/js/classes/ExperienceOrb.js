@@ -1,6 +1,6 @@
 // Item.js - Item classes for Crystalis game
 
-export class ExperienceOrb {
+export default class ExperienceOrb {
   constructor(x, y, value) {
     this.x = x;
     this.y = y;
