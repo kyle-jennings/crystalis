@@ -14,7 +14,7 @@ import {
 import {
   GAME_KEYS, MOVEMENT_KEYS, ACTION_KEYS, INPUT_CONFIG,
 } from './inputMappings.js';
-import DevMode from './classes/DevMode.js';
+import LevelEditor from './dev/LevelEditor.js';
 
 // Import all level modules as objects
 import * as Level1 from './levels/level-1.js';
@@ -39,8 +39,7 @@ class CrystalisGame {
     this.currentLevel = 1;
     this.maxLevel = 3;
     this.currentLevelObj = null; // Will hold the active level module
-    this.devMode = new DevMode(this); // Developer mode instance
-
+    this.levelEditor = new LevelEditor(this);
     this.gameTime = 0;
     this.camera = { x: 0, y: 0 };
     this.worldWidth = 1024;
@@ -60,6 +59,7 @@ class CrystalisGame {
     this.stalactites = []; // Add stalactites array
     this.houses = []; // Add houses array
     this.walls = []; // Add walls array
+    this.entries = []; // Add entries array for level transitions
 
     // Input handling
     this.keys = {};
@@ -73,19 +73,18 @@ class CrystalisGame {
     this.chargeRequiredTime = INPUT_CONFIG.chargeRequiredTime;
     this.chargeIndicatorDelay = INPUT_CONFIG.chargeIndicatorDelay;
 
-    // Check for dev mode before initializing
-    this.devMode.initialize().then(() => {
-      // Initialize world
-      this.loadLevel(this.currentLevel);
-      this.setupEventListeners();
-      this.updateUI();
+    // Initialize world
+    this.loadLevel(this.currentLevel);
+    this.setupEventListeners();
+    this.updateUI();
 
-      // Make game instance globally accessible for button
-      window.game = this;
+    // Make game instance globally accessible for button
+    window.game = this;
 
-      // Start game loop
-      this.gameLoop();
-    });
+    // Start game loop
+    this.gameLoop();
+
+    this.levelEditor.initialize();
   }
 
   loadLevel(levelNumber) {
@@ -210,14 +209,6 @@ class CrystalisGame {
         this.switchLevel(-1);
         e.preventDefault();
       }
-
-      // Dev mode specific controls
-      if (this.devMode.enabled) {
-        const handled = this.devMode.handleKeyInput(e.code);
-        if (handled) {
-          e.preventDefault();
-        }
-      }
     });
   }
 
@@ -238,6 +229,15 @@ class CrystalisGame {
       this.loadLevel(this.currentLevel);
       this.updateUI();
       return; // Skip rest of update to avoid issues during level transition
+    }
+
+    // Check for entry collisions (level transitions)
+    for (const entry of this.entries) {
+      if (entry.checkCollision(this.player)) {
+        if (entry.activate(this)) {
+          return; // Skip rest of update due to level transition
+        }
+      }
     }
 
     // Update enemies
@@ -674,7 +674,7 @@ class CrystalisGame {
 
   gameLoop() {
     // Normal game update only if not in editor mode
-    if (!this.devMode.editorMode) {
+    if (!this.levelEditor.enabled) {
       this.update();
     } else {
       // Limited update for editor (no player movement, frozen enemies)
@@ -684,15 +684,15 @@ class CrystalisGame {
     this.render();
 
     // Render editor if active
-    if (this.devMode.editorMode && this.devMode.levelEditor) {
-      this.devMode.levelEditor.updateEditorCamera();
-      this.devMode.levelEditor.renderEditor();
+    if (this.levelEditor.enabled && this.levelEditor) {
+      this.levelEditor.updateEditorCamera();
+      this.levelEditor.renderEditor();
     }
 
     // Update dev panel if dev mode is enabled
-    if (this.devMode.enabled) {
-      this.devMode.updateDevPanel();
-    }
+    // if (this.levMode.enabled) {
+    //   this.levMode.updateDevPanel();
+    // }
 
     requestAnimationFrame(() => this.gameLoop());
   }

@@ -1,34 +1,46 @@
 // LevelEditor.js - Level editing functionality for Crystalis game
-import Tree from './Tree.js';
-import Mountain from './Mountain.js';
-import House from './House.js';
-import Wall from './Wall.js';
-import { ExperienceOrb } from './Item.js';
+import Tree from '../classes/Tree.js';
+import Mountain from '../classes/Mountain.js';
+import House from '../classes/House.js';
+import Wall from '../classes/Wall.js';
+import Entry from '../classes/Entry.js';
+import { ExperienceOrb } from '../classes/Item.js';
 
 export default class LevelEditor {
   constructor(game) {
     this.game = game;
     this.enabled = false;
     this.selectedTool = 'tree';
+    this.deleteMode = false; // New delete mode flag
     this.editorCanvas = null;
     this.editorCtx = null;
     this.editorCamera = { x: 0, y: 0 };
-
+    
     // Available tools/objects
     this.availableObjects = {
       tree: { name: 'Tree', class: Tree, color: '#228B22' },
       mountain: { name: 'Mountain', class: Mountain, color: '#8B4513' },
       house: { name: 'House', class: House, color: '#CD853F' },
       wall: { name: 'Wall', class: Wall, color: '#696969' },
+      entry: { name: 'Level Entry', class: Entry, color: '#00ff00' },
       item: { name: 'Experience Orb', class: ExperienceOrb, color: '#FFD700' },
     };
   }
 
-  initialize() {
+  async initialize() {
     this.createEditorCanvas();
     this.setupEditorEventListeners();
     this.enabled = true;
     console.log('Level Editor initialized');
+
+
+    // const editorPanelData = this.getEditorPanelHTML();
+    // const { label, content } = editorPanelData;
+    // const selectedTool = document.querySelector('.editor-tool-label span');
+    // if (selectedTool) selectedTool.innerHTML = label;
+
+    // const devPanel = document.getElementById('objectPalette');
+    // if (devPanel) devPanel.innerHTML = content;
   }
 
   createEditorCanvas() {
@@ -43,7 +55,8 @@ export default class LevelEditor {
     }
 
     this.editorCtx = this.editorCanvas.getContext('2d');
-
+    console.log(gameCanvas.width);
+    console.log(gameCanvas.height);
     // Match game canvas size
     this.editorCanvas.width = gameCanvas.width;
     this.editorCanvas.height = gameCanvas.height;
@@ -69,7 +82,20 @@ export default class LevelEditor {
       const x = e.clientX - rect.left + this.editorCamera.x;
       const y = e.clientY - rect.top + this.editorCamera.y;
 
-      this.placeObject(x, y);
+      // First check if we clicked on an existing object
+      const clickedObject = this.getObjectAtPosition(x, y);
+      if (clickedObject && typeof window !== 'undefined' && window.devPanelHandleObjectClick) {
+        // Call the DevPanel function to populate the form
+        window.devPanelHandleObjectClick(clickedObject);
+        return;
+      }
+
+      // If no object was clicked, proceed with normal placement/deletion
+      if (this.deleteMode) {
+        this.removeObject(x, y);
+      } else {
+        this.placeObject(x, y);
+      }
     });
 
     this.editorCanvas.addEventListener('contextmenu', (e) => {
@@ -102,12 +128,56 @@ export default class LevelEditor {
       case 'wall':
         this.game.walls.push(new Wall(x, y, 32, 32, false));
         break;
+      case 'entry':
+        this.game.entries.push(new Entry(x, y, 32, 32, 2)); // Default to level 2
+        break;
       case 'item':
         this.game.items.push(new ExperienceOrb(x, y, 5));
         break;
     }
 
     console.log(`Placed ${objectType.name} at (${Math.round(x)}, ${Math.round(y)})`);
+  }
+
+  getObjectAtPosition(x, y) {
+    const clickDistance = 20; // Distance threshold for clicking
+
+    // Check each object type for clicks
+    const objectArrays = [
+      { array: this.game.trees, name: 'tree' },
+      { array: this.game.mountains, name: 'mountain' },
+      { array: this.game.houses, name: 'house' },
+      { array: this.game.walls, name: 'wall' },
+      { array: this.game.entries, name: 'entry' },
+      { array: this.game.items, name: 'item' },
+    ];
+
+    for (const { array, name } of objectArrays) {
+      for (const obj of array) {
+        // Check if click is within object bounds or within click distance
+        let isWithinObject = false;
+        
+        if (obj.width && obj.height) {
+          // For objects with defined width/height, check if click is within bounds
+          isWithinObject = x >= obj.x && x <= obj.x + obj.width && 
+                          y >= obj.y && y <= obj.y + obj.height;
+        } else {
+          // For objects without defined bounds, use distance threshold
+          const distance = Math.sqrt((obj.x - x) ** 2 + (obj.y - y) ** 2);
+          isWithinObject = distance <= clickDistance;
+        }
+
+        if (isWithinObject) {
+          // Return a copy of the object with its type for the DevPanel
+          return {
+            ...obj,
+            type: name
+          };
+        }
+      }
+    }
+
+    return null; // No object found at this position
   }
 
   removeObject(x, y) {
@@ -119,6 +189,7 @@ export default class LevelEditor {
       { array: this.game.mountains, name: 'mountain' },
       { array: this.game.houses, name: 'house' },
       { array: this.game.walls, name: 'wall' },
+      { array: this.game.entries, name: 'entry' },
       { array: this.game.items, name: 'item' },
     ];
 
@@ -154,6 +225,30 @@ export default class LevelEditor {
         selectedToolButton.classList.add('selected');
       }
     }
+  }
+
+  toggleDeleteMode() {
+    this.deleteMode = !this.deleteMode;
+    console.log(`Delete mode: ${this.deleteMode ? 'ON' : 'OFF'}`);
+
+    // Update delete button visual state
+    const deleteButton = document.querySelector('[data-delete-btn]');
+    if (deleteButton) {
+      if (this.deleteMode) {
+        deleteButton.classList.add('is-danger', 'is-active');
+        deleteButton.textContent = 'Exit Delete Mode';
+      } else {
+        deleteButton.classList.remove('is-danger', 'is-active');
+        deleteButton.textContent = 'Delete Mode';
+      }
+    }
+
+    // Update cursor style for editor canvas
+    if (this.editorCanvas) {
+      this.editorCanvas.style.cursor = this.deleteMode ? 'crosshair' : 'default';
+    }
+
+    return this.deleteMode;
   }
 
   renderEditor() {
@@ -226,6 +321,12 @@ export default class LevelEditor {
     game.stalactites.forEach((stalactite) => {
       stalactite.draw(this.editorCtx);
       this.drawSelectionBox(stalactite, '#666666');
+    });
+
+    // Draw entries (invisible in game, bright green in editor)
+    game.entries.forEach((entry) => {
+      entry.draw(this.editorCtx, true); // Pass true for editor mode
+      this.drawSelectionBox(entry, '#00ff00');
     });
 
     // Draw items
@@ -312,6 +413,7 @@ export default class LevelEditor {
         height: w.height,
         isOpening: w.isOpening || false,
       })),
+      entries: this.game.entries.map((e) => e.getExportData()),
       items: this.game.items.map((i) => ({
         x: i.x,
         y: i.y,
@@ -343,4 +445,38 @@ export default class LevelEditor {
     this.enabled = false;
     console.log('Level Editor destroyed');
   }
+
+  getEditorPanelHTML() {
+    return {
+      label: this.selectedTool,
+      content: this.getObjectPaletteHTML(),
+    };
+  }
+
+  getObjectPaletteHTML() {
+    const tools = this.availableObjects;
+
+    return Object.entries(tools).map(([key, obj]) => `
+      <option value="${key}" >
+        ${obj.name}
+      </option>
+    `).join('');
+  }
+
+
+  toggleLevelEditor() {
+    this.enabled = !this.enabled;
+    const $elm = document.getElementById('level-editor');
+    if (!$elm) return;
+
+    if (!this.enabled) {
+      console.log('activating level editor...');
+      $elm.classList.add('active');
+    } else {
+      console.log('deactivating level editor...');
+      $elm.classList.remove('active');
+      return;
+    }
+  }
+
 }
