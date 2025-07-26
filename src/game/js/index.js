@@ -680,50 +680,10 @@ class CrystalisGame {
 
   gameLoop() {
     this.update();
-    // // Normal game update only if not in editor mode
-    // if (!this.levelEditor.enabled) {
-    //     this.update();
-    // } else {
-    //   // Limited update for editor (no player movement, frozen enemies)
-    // }
-    // this.updateEditor();
-
     this.render();
-
-    // Render editor if active
-    // if (this.levelEditor.enabled && this.levelEditor) {
-    //   this.levelEditor.updateEditorCamera();
-    //   this.levelEditor.renderEditor();
-    // }
-
-    // Update dev panel if dev mode is enabled
-    // if (this.levMode.enabled) {
-    //   this.levMode.updateDevPanel();
-    // }
-
     requestAnimationFrame(() => this.gameLoop());
   }
 
-  updateEditor() {
-    // Only update essential systems for editor
-    this.gameTime += 1 / 60;
-
-    // Update camera for editor (could be independent of game camera)
-    this.updateCamera();
-
-    // Update items (for visual feedback)
-    this.items.forEach((item) => item.update());
-
-    // Update effects (so they can finish and be removed)
-    for (let i = this.effects.length - 1; i >= 0; i--) {
-      const effect = this.effects[i];
-      effect.update();
-
-      if (effect.shouldRemove) {
-        this.effects.splice(i, 1);
-      }
-    }
-  }
 }
 
 // Start the game when page loads
