@@ -228,18 +228,16 @@ class CrystalisGame {
 
       // Only update enemy movement if enabled
       if (this.enemiesCanMove) {
-        enemy.update(this.player);
-
-        // Check for collisions and handle them
-        const collidingTree = enemy.checkTreeCollisions(this.trees);
-        const collidingMountain = enemy.checkMountainCollisions(this.mountains);
-        const collidingStalactite = enemy.checkStalactiteCollisions(this.stalactites);
-        const collidingHouse = enemy.checkHouseCollisions(this.houses);
-        const collidingWall = enemy.checkWallCollisions(this.walls);
-
-        if (collidingTree || collidingMountain || collidingStalactite || collidingHouse || collidingWall) {
-          enemy.tryAlternativeMovement(this.trees, this.mountains, this.stalactites, this.houses, this.walls);
-        }
+        // Pass game entities to enemy for collision detection
+        const gameEntities = {
+          trees: this.trees,
+          mountains: this.mountains,
+          stalactites: this.stalactites,
+          houses: this.houses,
+          walls: this.walls
+        };
+        
+        enemy.update(this.player, gameEntities);
       } else {
         // Still update animation even when frozen
         enemy.updateAnimation();

@@ -63,7 +63,7 @@ export class Enemy {
     this.animTime = 0;
   }
 
-  update(player) {
+  update(player, gameEntities = {}) {
     // Simple AI - move toward player
     const dx = player.x - this.x;
     const dy = player.y - this.y;
@@ -81,11 +81,29 @@ export class Enemy {
       this.x += moveX;
       this.y += moveY;
 
-      // Check tree collisions (will be called from game class)
+      // Store movement data for alternative movement attempts
       this.originalX = originalX;
       this.originalY = originalY;
       this.attemptedMoveX = moveX;
       this.attemptedMoveY = moveY;
+
+      // Check for collisions with all game entities
+      const collidingTree = gameEntities.trees ? this.checkTreeCollisions(gameEntities.trees) : null;
+      const collidingMountain = gameEntities.mountains ? this.checkMountainCollisions(gameEntities.mountains) : null;
+      const collidingStalactite = gameEntities.stalactites ? this.checkStalactiteCollisions(gameEntities.stalactites) : null;
+      const collidingHouse = gameEntities.houses ? this.checkHouseCollisions(gameEntities.houses) : null;
+      const collidingWall = gameEntities.walls ? this.checkWallCollisions(gameEntities.walls) : null;
+
+      // If any collision occurred, try alternative movement
+      if (collidingTree || collidingMountain || collidingStalactite || collidingHouse || collidingWall) {
+        this.tryAlternativeMovement(
+          gameEntities.trees || [], 
+          gameEntities.mountains || [], 
+          gameEntities.stalactites || [], 
+          gameEntities.houses || [], 
+          gameEntities.walls || []
+        );
+      }
     }
 
     this.updateAnimation();
