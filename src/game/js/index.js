@@ -1,6 +1,8 @@
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable max-len */
 // Crystalis Clone - First Area Implementation
+
+import MagicSystem from './classes/MagicSystem.js';
 import Player from './classes/Player.js';
 // import { Enemy, Slime, Ant } from './classes/Enemy.js';
 import { SwordProjectile } from './classes/Projectile.js';
@@ -8,7 +10,6 @@ import ExperienceOrb from '@game/js/classes/ExperienceOrb.js';
 import {
   // Effect,
   HitEffect,
-  HealEffect,
   MeleeAttackEffect,
 } from './classes/Effect.js';
 import {
@@ -46,7 +47,8 @@ class CrystalisGame {
 
     // Player stats and state
     this.player = new Player(256, 400); // Start in center of first area
-
+    this.magicSystem = new MagicSystem(this.player, this);
+    
     // Game entities
     this.enemies = [];
     this.items = [];
@@ -294,6 +296,9 @@ class CrystalisGame {
 
     // Update camera to follow player
     this.updateCamera();
+
+    // Update magic system
+    this.magicSystem.update(1/60); // Pass delta time
   }
 
   handleInput() {
@@ -361,15 +366,23 @@ class CrystalisGame {
       this.keys[ACTION_KEYS.dash] = false;
     }
 
-    // Magic/Item use
-    if (this.keys[ACTION_KEYS.magic] && this.gameTime - this.lastMagicTime > INPUT_CONFIG.magicCooldown) {
-      this.useMagic();
-      this.lastMagicTime = this.gameTime;
-    }
-
     // Change magic (placeholder)
     if (this.keys[ACTION_KEYS.changeMagic]) {
       // Cycle through magic spells
+    }
+
+    // Magic/Item use
+    if (this.keys[ACTION_KEYS.magic] && this.gameTime - this.lastMagicTime > INPUT_CONFIG.magicCooldown) {
+      this.magicSystem.castSpell();
+      this.lastMagicTime = this.gameTime;
+      this.updateUI();
+    }
+
+    // Change magic
+    if (this.keys[ACTION_KEYS.changeMagic]) {
+      this.magicSystem.cycleSpell();
+      this.updateUI();
+      this.keys[ACTION_KEYS.changeMagic] = false; // Prevent repeated cycling
     }
   }
 
@@ -427,14 +440,41 @@ class CrystalisGame {
     this.effects.push(new MeleeAttackEffect(attackX, attackY, angle));
   }
 
-  useMagic() {
-    if (this.player.mp >= 2) {
-      this.player.mp -= 2;
+  drawChargeIndicator() {
+    if (this.isCharging) {
+      const chargeTime = this.gameTime - this.chargeStartTime;
 
-      // Create heal effect for now
-      this.player.hp = Math.min(this.player.hp + 5, this.player.maxHp);
-      this.effects.push(new HealEffect(this.player.x, this.player.y));
-      this.updateUI();
+      // Only show indicator after the delay
+      if (chargeTime >= this.chargeIndicatorDelay) {
+        const chargeProgress = Math.min(chargeTime / this.chargeRequiredTime, 1.0);
+
+        // Draw charge bar at bottom of screen
+        const barWidth = 200;
+        const barHeight = 20;
+        const barX = (this.width - barWidth) / 2;
+        const barY = this.height - 40;
+
+        // Background
+        this.ctx.fillStyle = '#333';
+        this.ctx.fillRect(barX, barY, barWidth, barHeight);
+
+        // Border
+        this.ctx.strokeStyle = '#fff';
+        this.ctx.lineWidth = 2;
+        this.ctx.strokeRect(barX, barY, barWidth, barHeight);
+
+        // Charge progress
+        const fillWidth = barWidth * chargeProgress;
+        this.ctx.fillStyle = chargeProgress >= 1.0 ? '#00ff00' : '#ffff00';
+        this.ctx.fillRect(barX, barY, fillWidth, barHeight);
+
+        // Text
+        this.ctx.fillStyle = '#fff';
+        this.ctx.font = '14px Courier New';
+        this.ctx.textAlign = 'center';
+        const text = chargeProgress >= 1.0 ? 'READY!' : 'Charging...';
+        this.ctx.fillText(text, this.width / 2, barY - 5);
+      }
     }
   }
 
@@ -567,44 +607,6 @@ class CrystalisGame {
     this.drawChargeIndicator();
   }
 
-  drawChargeIndicator() {
-    if (this.isCharging) {
-      const chargeTime = this.gameTime - this.chargeStartTime;
-
-      // Only show indicator after the delay
-      if (chargeTime >= this.chargeIndicatorDelay) {
-        const chargeProgress = Math.min(chargeTime / this.chargeRequiredTime, 1.0);
-
-        // Draw charge bar at bottom of screen
-        const barWidth = 200;
-        const barHeight = 20;
-        const barX = (this.width - barWidth) / 2;
-        const barY = this.height - 40;
-
-        // Background
-        this.ctx.fillStyle = '#333';
-        this.ctx.fillRect(barX, barY, barWidth, barHeight);
-
-        // Border
-        this.ctx.strokeStyle = '#fff';
-        this.ctx.lineWidth = 2;
-        this.ctx.strokeRect(barX, barY, barWidth, barHeight);
-
-        // Charge progress
-        const fillWidth = barWidth * chargeProgress;
-        this.ctx.fillStyle = chargeProgress >= 1.0 ? '#00ff00' : '#ffff00';
-        this.ctx.fillRect(barX, barY, fillWidth, barHeight);
-
-        // Text
-        this.ctx.fillStyle = '#fff';
-        this.ctx.font = '14px Courier New';
-        this.ctx.textAlign = 'center';
-        const text = chargeProgress >= 1.0 ? 'READY!' : 'Charging...';
-        this.ctx.fillText(text, this.width / 2, barY - 5);
-      }
-    }
-  }
-
   drawBackground() {
     // this.Level is already the LevelBuilder instance
     const levelInstance = this.Level;
@@ -653,6 +655,12 @@ class CrystalisGame {
     // Update MP bar
     const mpPercent = (this.player.mp / this.player.maxMp) * 100;
     document.getElementById('mpFill').style.width = `${mpPercent}%`;
+
+    // Add current spell to UI
+    const currentSpellElement = document.getElementById('currentSpell');
+    if (currentSpellElement) {
+      currentSpellElement.textContent = this.magicSystem.getCurrentSpellName();
+    }
   }
 
   // eslint-disable-next-line class-methods-use-this

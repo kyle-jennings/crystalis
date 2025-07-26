@@ -1,19 +1,8 @@
 <script setup>
-import {
-  onMounted,
-} from 'vue';
-import LevelEditorClass from '@game/js/dev/LevelEditorV2';
+
 import LevelEditorPallet from './LevelEditorPallet.vue';
 import LevelEditorSettings from './LevelEditorSettings.vue';
 
-onMounted(() => {
-  if (!window.game) {
-    console.log('game not initialized');
-    return;
-  }
-  const LevelEditor = new LevelEditorClass(window.game, '#level-editor');
-  LevelEditor.initialize();
-});
 </script>
 
 <template>

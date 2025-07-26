@@ -5,6 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crystalis Clone - Vue App</title>
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+        <script>
+        // Function to toggle instructions visibility
+        function toggleInstructions() {
+            const content = document.getElementById('instructionsContent');
+            const toggle = document.getElementById('instructionsToggle');
+            
+            content.classList.toggle('collapsed');
+            toggle.classList.toggle('collapsed');
+        }
+        
+        // Make toggle function globally accessible
+        window.toggleInstructions = toggleInstructions;
+    </script>
 </head>
 <body>
     <div id="app"></div>
