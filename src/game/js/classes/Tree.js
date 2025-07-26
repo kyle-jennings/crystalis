@@ -1,5 +1,44 @@
 // Tree.js - Tree obstacle class for Crystalis game
 export default class Tree {
+  static constructorParams = {
+    x: {
+      type: 'number',
+      description: 'X position of the tree',
+    },
+    y: {
+      type: 'number',
+      description: 'Y position of the tree',
+    },
+    width: {
+      type: 'number',
+      description: 'Width of the tree sprite',
+    },
+    height: {
+      type: 'number',
+      description: 'Height of the tree sprite',
+    },
+    type: {
+      type: 'string',
+      description: 'Type identifier for this object (always "tree")',
+    },
+    collisionX: {
+      type: 'number',
+      description: 'X position of collision box (smaller than visual)',
+    },
+    collisionY: {
+      type: 'number',
+      description: 'Y position of collision box (bottom part only)',
+    },
+    collisionWidth: {
+      type: 'number',
+      description: 'Width of collision box',
+    },
+    collisionHeight: {
+      type: 'number',
+      description: 'Height of collision box',
+    },
+  };
+
   constructor(x, y) {
     this.x = x;
     this.y = y;

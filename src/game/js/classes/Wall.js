@@ -1,5 +1,48 @@
 // Wall.js - Wall class for village borders with brick texture
 export default class Wall {
+  static constructorParams = {
+    x: {
+      type: 'number',
+      description: 'X position of the wall',
+    },
+    y: {
+      type: 'number',
+      description: 'Y position of the wall',
+    },
+    width: {
+      type: 'number',
+      description: 'Width of the wall segment',
+    },
+    height: {
+      type: 'number',
+      description: 'Height of the wall segment',
+    },
+    isOpening: {
+      type: 'boolean',
+      description: 'If true, this is a gap in the wall (no collision)',
+    },
+    type: {
+      type: 'string',
+      description: 'Type identifier for this object (always "wall")',
+    },
+    collisionX: {
+      type: 'number',
+      description: 'X position of collision box',
+    },
+    collisionY: {
+      type: 'number',
+      description: 'Y position of collision box',
+    },
+    collisionWidth: {
+      type: 'number',
+      description: 'Width of collision box',
+    },
+    collisionHeight: {
+      type: 'number',
+      description: 'Height of collision box',
+    },
+  };
+
   constructor(x, y, width, height, isOpening = false) {
     this.x = x;
     this.y = y;

@@ -1,5 +1,48 @@
 // Stalactite.js - Cave stalactite/stalagmite class
 export default class Stalactite {
+  static constructorParams = {
+    x: {
+      type: 'number',
+      description: 'X position of the stalactite',
+    },
+    y: {
+      type: 'number',
+      description: 'Y position of the stalactite',
+    },
+    width: {
+      type: 'number',
+      description: 'Width of the stalactite',
+    },
+    height: {
+      type: 'number',
+      description: 'Height of the stalactite (varies by type)',
+    },
+    type: {
+      type: 'string',
+      description: 'Type identifier for this object (always "stalactite")',
+    },
+    isStalagtite: {
+      type: 'boolean',
+      description: 'True if hangs from ceiling, false if grows from floor',
+    },
+    collisionX: {
+      type: 'number',
+      description: 'X position of collision box',
+    },
+    collisionY: {
+      type: 'number',
+      description: 'Y position of collision box',
+    },
+    collisionWidth: {
+      type: 'number',
+      description: 'Width of collision box',
+    },
+    collisionHeight: {
+      type: 'number',
+      description: 'Height of collision box',
+    },
+  };
+
   constructor(x, y, isStalagtite = true) {
     this.x = x;
     this.y = y;

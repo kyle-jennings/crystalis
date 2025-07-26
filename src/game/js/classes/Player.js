@@ -1,5 +1,148 @@
 // Player.js - Player class for Crystalis game
 export default class Player {
+  static constructorParams = {
+    x: {
+      type: 'number',
+      description: 'X position of the player',
+    },
+    y: {
+      type: 'number',
+      description: 'Y position of the player',
+    },
+    width: {
+      type: 'number',
+      description: 'Width of player sprite (fixed at 16)',
+    },
+    height: {
+      type: 'number',
+      description: 'Height of player sprite (fixed at 16)',
+    },
+    speed: {
+      type: 'number',
+      description: 'Movement speed of the player',
+    },
+    facing: {
+      type: 'number',
+      description: '8-directional facing (0=up, 2=right, 4=down, 6=left)',
+    },
+    level: {
+      type: 'number',
+      description: 'Player experience level',
+    },
+    hp: {
+      type: 'number',
+      description: 'Current hit points',
+    },
+    maxHp: {
+      type: 'number',
+      description: 'Maximum hit points',
+    },
+    mp: {
+      type: 'number',
+      description: 'Current magic points',
+    },
+    maxMp: {
+      type: 'number',
+      description: 'Maximum magic points',
+    },
+    exp: {
+      type: 'number',
+      description: 'Current experience points',
+    },
+    expToNext: {
+      type: 'number',
+      description: 'Experience points needed for next level',
+    },
+    currentSword: {
+      type: 'string',
+      description: 'Currently equipped sword element',
+    },
+    attackPower: {
+      type: 'number',
+      description: 'Base attack damage',
+    },
+    invulnerable: {
+      type: 'boolean',
+      description: 'Whether player is currently invulnerable',
+    },
+    invulnerabilityTime: {
+      type: 'number',
+      description: 'Time remaining for invulnerability',
+    },
+    dashInvulnerable: {
+      type: 'boolean',
+      description: 'Separate invulnerability for dashing',
+    },
+    isAttacking: {
+      type: 'boolean',
+      description: 'Whether player is currently attacking',
+    },
+    attackAnimationTime: {
+      type: 'number',
+      description: 'Time remaining for attack animation',
+    },
+    attackDuration: {
+      type: 'number',
+      description: 'Duration of attack animation (0.3 seconds)',
+    },
+    isDashing: {
+      type: 'boolean',
+      description: 'Whether player is currently dashing',
+    },
+    dashTime: {
+      type: 'number',
+      description: 'Time remaining for current dash',
+    },
+    dashDuration: {
+      type: 'number',
+      description: 'Duration of dash (0.2 seconds)',
+    },
+    dashSpeed: {
+      type: 'number',
+      description: 'Speed multiplier during dash',
+    },
+    dashCooldown: {
+      type: 'number',
+      description: 'Time remaining for dash cooldown',
+    },
+    dashCooldownTime: {
+      type: 'number',
+      description: 'Duration of dash cooldown (1 second)',
+    },
+    dashCharges: {
+      type: 'number',
+      description: 'Number of dash charges available',
+    },
+    maxDashCharges: {
+      type: 'number',
+      description: 'Maximum number of dash charges',
+    },
+    dashChargeRegenTime: {
+      type: 'number',
+      description: 'Time to regenerate one dash charge',
+    },
+    dashChargeFlash: {
+      type: 'boolean',
+      description: 'Flash effect when charge is regenerated',
+    },
+    dashChargeFlashTime: {
+      type: 'number',
+      description: 'Duration of flash effect',
+    },
+    animFrame: {
+      type: 'number',
+      description: 'Current animation frame',
+    },
+    animTime: {
+      type: 'number',
+      description: 'Animation timing counter',
+    },
+    isMoving: {
+      type: 'boolean',
+      description: 'Whether player is currently moving',
+    },
+  };
+
   constructor(x, y) {
     this.x = x;
     this.y = y;

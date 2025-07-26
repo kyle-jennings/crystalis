@@ -1,44 +1,26 @@
-<script>
-import { ref } from 'vue';
-import DevPanel from '@/components/DevPanel.vue';
+<script setup lang="ts">
+import { ref, computed } from 'vue';
+// import DevPanel from '@/components/DevPanel.vue';
 import GameCanvas from '@/components/GameCanvas.vue';
+import LevelEditor from '@/components/LevelEditor.vue';
 
-export default {
-  name: 'App',
-  components: {
-    DevPanel,
-    GameCanvas,
-  },
-  setup() {
-    const counter = ref(0);
-
-    const showMessage = () => {
-      // Buefy toast notification
-      this.$buefy.toast.open({
-        message: 'Hello from Buefy!',
-        type: 'is-success',
-      });
-    };
-
-    const incrementCounter = () => {
-      counter.value++;
-    };
-
-    return {
-      counter,
-      showMessage,
-      incrementCounter,
-    };
-  },
-};
+const editorMode = ref(false);
+const editorToggleLabel = computed(() => (editorMode.value ? 'Disable Editor' : 'Enable Editor'));
 </script>
 
 <template>
   <div id="app">
-    <div id="mainFlexWrapper" class="container">
-      <DevPanel />
-
-      <GameCanvas />
+    <div class="container">
+      <div>
+        <b-button
+          :label="editorToggleLabel"
+          @click="editorMode = !editorMode"
+        />
+      </div>
+      <div class="is-flex is-justify-content-space-between">
+        <level-editor v-show="editorMode"/>
+        <game-canvas v-show="!editorMode" />
+      </div>
     </div>
   </div>
 </template>

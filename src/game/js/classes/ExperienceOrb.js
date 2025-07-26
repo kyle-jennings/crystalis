@@ -1,6 +1,29 @@
 // Item.js - Item classes for Crystalis game
 
 export default class ExperienceOrb {
+  static constructorParams = {
+    x: {
+      type: 'number',
+      description: 'X position of the experience orb',
+    },
+    y: {
+      type: 'number',
+      description: 'Y position of the experience orb',
+    },
+    value: {
+      type: 'number',
+      description: 'Experience points this orb gives when collected',
+    },
+    bobOffset: {
+      type: 'number',
+      description: 'Vertical bobbing animation offset',
+    },
+    bobSpeed: {
+      type: 'number',
+      description: 'Speed of the bobbing animation',
+    },
+  };
+
   constructor(x, y, value) {
     this.x = x;
     this.y = y;

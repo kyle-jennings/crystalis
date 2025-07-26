@@ -16,9 +16,10 @@ import {
 } from './lib/inputMappings.js';
 
 // Import all level modules as objects
-import * as Level1 from './levels/level-1.js';
-import * as Level2 from './levels/level-2.js';
-import * as Level3 from './levels/level-3.js';
+import LevelBuilder from '@/game/js/classes/LevelBuilder.js';
+import Level1 from './levels/level-1.js';
+import Level2 from './levels/level-2.js';
+import Level3 from './levels/level-3.js';
 
 // Level registry for easy access
 const LEVELS = {
@@ -37,7 +38,7 @@ class CrystalisGame {
     // Game state
     this.currentLevel = 1;
     this.maxLevel = 3;
-    this.currentLevelObj = null; // Will hold the active level module
+    this.Level = null; // Will hold the active level module
     this.gameTime = 0;
     this.camera = { x: 0, y: 0 };
     this.worldWidth = 1024;
@@ -86,48 +87,35 @@ class CrystalisGame {
 
   loadLevel(levelNumber) {
     // Set current level object
-    this.currentLevelObj = LEVELS[levelNumber];
+    this.Level = new LevelBuilder(LEVELS[levelNumber]);
 
-    if (!this.currentLevelObj) {
+    if (!this.Level) {
       console.warn(`Level ${levelNumber} not found, loading level 1`);
       // eslint-disable-next-line prefer-destructuring
-      this.currentLevelObj = LEVELS[1];
+      this.Level = LEVELS[1];
       this.currentLevel = 1;
     }
 
-    // Get level configs if they exist
-    const levelConfigs = this.currentLevelObj.canvasConfigs || {};
+    // Get the Level instance if it exists, otherwise fall back to old format
 
+    // Using new Level class
+    console.log('Loading level using Level class');
+    
     // Reset player position to spawn point
-    this.player.x = levelConfigs.playerX || 256;
-    this.player.y = levelConfigs.playerY || 400;
+    this.player.x = this.Level.playerX;
+    this.player.y = this.Level.playerY;
 
-    // Adjust canvas size based on level configs
-    if (levelConfigs.canvasWidth && levelConfigs.canvasHeight) {
-      // Level has custom canvas size
-      this.canvas.width = levelConfigs.canvasWidth;
-      this.canvas.height = levelConfigs.canvasHeight;
-      this.width = levelConfigs.width || levelConfigs.canvasWidth;
-      this.height = levelConfigs.height || levelConfigs.canvasHeight;
-      this.worldWidth = levelConfigs.worldWidth || levelConfigs.canvasWidth;
-      this.worldHeight = levelConfigs.worldHeight || levelConfigs.canvasHeight;
-    } else {
-      // Use default canvas size
-      this.canvas.width = 512;
-      this.canvas.height = 480;
-      this.width = this.canvas.width;
-      this.height = this.canvas.height;
-      this.worldWidth = 1024;
-      this.worldHeight = 768;
-    }
+    // Adjust canvas size based on level instance
+    this.canvas.width = this.Level.canvasWidth;
+    this.canvas.height = this.Level.canvasHeight;
+    this.width = this.Level.width;
+    this.height = this.Level.height;
+    this.worldWidth = this.Level.worldWidth;
+    this.worldHeight = this.Level.worldHeight;
 
-    // Initialize the level using the level object's initialize function
-    if (typeof this.currentLevelObj.initialize === 'function') {
-      this.currentLevelObj.initialize(this);
-    } else {
-      console.error(`No initialize function found for level ${levelNumber}`);
-    }
-
+    // Initialize the level using the Level class
+    this.Level.initialize(this);
+    
     console.log(`Loaded Level ${this.currentLevel}`);
   }
 
@@ -482,23 +470,45 @@ class CrystalisGame {
   }
 
   updateCamera() {
-    // Check if level has custom camera behavior
-    const levelConfigs = this.currentLevelObj?.canvasConfigs || {};
+    // Get level instance or fall back to legacy configs
+    const levelInstance = this.Level?.level;
+    
+    if (levelInstance) {
+      // Using new Level class
+      // If level canvas size matches world size, use fixed camera (like village)
+      if (levelInstance.canvasWidth === levelInstance.worldWidth
+              && levelInstance.canvasHeight === levelInstance.worldHeight) {
+        // Fixed camera - show entire level
+        this.camera.x = 0;
+        this.camera.y = 0;
+      } else {
+        // Dynamic camera - center on player
+        this.camera.x = this.player.x - this.width / 2;
+        this.camera.y = this.player.y - this.height / 2;
 
-    // If level canvas size matches world size, use fixed camera (like village)
-    if (levelConfigs.canvasWidth === levelConfigs.worldWidth
-            && levelConfigs.canvasHeight === levelConfigs.worldHeight) {
-      // Fixed camera - show entire level
-      this.camera.x = 0;
-      this.camera.y = 0;
+        // Clamp camera to world bounds
+        this.camera.x = Math.max(0, Math.min(this.camera.x, this.worldWidth - this.width));
+        this.camera.y = Math.max(0, Math.min(this.camera.y, this.worldHeight - this.height));
+      }
     } else {
-      // Dynamic camera - center on player
-      this.camera.x = this.player.x - this.width / 2;
-      this.camera.y = this.player.y - this.height / 2;
+      // Fall back to legacy format
+      const levelConfigs = this.Level?.canvasConfigs || {};
 
-      // Clamp camera to world bounds
-      this.camera.x = Math.max(0, Math.min(this.camera.x, this.worldWidth - this.width));
-      this.camera.y = Math.max(0, Math.min(this.camera.y, this.worldHeight - this.height));
+      // If level canvas size matches world size, use fixed camera (like village)
+      if (levelConfigs.canvasWidth === levelConfigs.worldWidth
+              && levelConfigs.canvasHeight === levelConfigs.worldHeight) {
+        // Fixed camera - show entire level
+        this.camera.x = 0;
+        this.camera.y = 0;
+      } else {
+        // Dynamic camera - center on player
+        this.camera.x = this.player.x - this.width / 2;
+        this.camera.y = this.player.y - this.height / 2;
+
+        // Clamp camera to world bounds
+        this.camera.x = Math.max(0, Math.min(this.camera.x, this.worldWidth - this.width));
+        this.camera.y = Math.max(0, Math.min(this.camera.y, this.worldHeight - this.height));
+      }
     }
   }
 
@@ -607,10 +617,21 @@ class CrystalisGame {
   }
 
   drawBackground() {
-    // Get background colors from current level configuration
-    const backgroundConfigs = this.currentLevelObj?.backgroundConfigs || {};
-    const backgroundColor = backgroundConfigs.backgroundColor || '#2d5016'; // Default to forest green
-    const accentColor = backgroundConfigs.accentColor || '#1a3009'; // Default to darker green
+    // Get level instance or fall back to legacy configs
+    const levelInstance = this.Level?.level;
+    
+    let backgroundColor, accentColor;
+    
+    if (levelInstance) {
+      // Using new Level class
+      backgroundColor = levelInstance.backgroundColor;
+      accentColor = levelInstance.accentColor;
+    } else {
+      // Fall back to legacy format
+      const backgroundConfigs = this.Level?.backgroundConfigs || {};
+      backgroundColor = backgroundConfigs.backgroundColor || '#2d5016'; // Default to forest green
+      accentColor = backgroundConfigs.accentColor || '#1a3009'; // Default to darker green
+    }
 
     // Draw background
     this.ctx.fillStyle = backgroundColor;
@@ -719,5 +740,5 @@ class CrystalisGame {
 
 // Start the game when page loads
 window.addEventListener('load', () => {
-  window.CrystalisGame = new CrystalisGame();
+  window.game = new CrystalisGame();
 });

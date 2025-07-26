@@ -1,9 +1,4 @@
 // First Area
-import { Slime, Ant } from '../classes/Enemy.js';
-import ExperienceOrb from '@game/js/classes/ExperienceOrb.js';
-import Tree from '../classes/Tree.js';
-import Mountain from '../classes/Mountain.js';
-
 // canvas configuration (default size)
 export const canvasConfigs = {
   canvasWidth: 540,
@@ -14,17 +9,13 @@ export const canvasConfigs = {
   worldHeight: 768,
   playerX: 256,
   playerY: 400,
-};
-
-// background configuration
-export const backgroundConfigs = {
   backgroundColor: '#2d5016', // Forest green
   accentColor: '#1a3009', // Darker green
   theme: 'forest',
 };
 
 // Starting area enemy configurations
-const enemyConfigs = [
+export const enemyConfigs = [
   {
     type: 'Slime', x: 300, y: 300, area: 'Starting area',
   },
@@ -40,7 +31,7 @@ const enemyConfigs = [
 ];
 
 // Item configurations (experience orbs scattered across map)
-const itemConfigs = [
+export const itemConfigs = [
   {
     x: 180, y: 200, value: 5, description: 'Starting area',
   },
@@ -59,7 +50,7 @@ const itemConfigs = [
 ];
 
 // Tree configurations (scattered across entire 1024x768 map)
-const treeConfigs = [
+export const treeConfigs = [
   // Starting area trees
   { x: 100, y: 100, area: 'Starting area' },
   { x: 200, y: 150, area: 'Starting area' },
@@ -98,7 +89,7 @@ const treeConfigs = [
 ];
 
 // Mountain configurations (various areas across map)
-const mountainConfigs = [
+export const mountainConfigs = [
   {
     x: 750, y: 500, hasPortal: false, portalDestination: null, description: 'Lower right area',
   },
@@ -113,37 +104,10 @@ const mountainConfigs = [
   },
 ];
 
-export function initialize(game) {
-  // Clear existing entities
-  game.enemies = [];
-  game.items = [];
-  game.trees = [];
-  game.mountains = [];
-  game.stalactites = [];
-  game.houses = [];
-  game.walls = [];
-
-  // Create enemies from configuration
-  enemyConfigs.forEach((config) => {
-    if (config.type === 'Slime') {
-      game.enemies.push(new Slime(config.x, config.y));
-    } else if (config.type === 'Ant') {
-      game.enemies.push(new Ant(config.x, config.y));
-    }
-  });
-
-  // Create items from configuration
-  itemConfigs.forEach((config) => {
-    game.items.push(new ExperienceOrb(config.x, config.y, config.value));
-  });
-
-  // Create trees from configuration
-  treeConfigs.forEach((config) => {
-    game.trees.push(new Tree(config.x, config.y));
-  });
-
-  // Create mountains from configuration
-  mountainConfigs.forEach((config) => {
-    game.mountains.push(new Mountain(config.x, config.y, config.hasPortal, config.portalDestination));
-  });
+export default {
+    ...canvasConfigs,
+    enemyConfigs: enemyConfigs,
+    items: itemConfigs,
+    mountains: mountainConfigs,
+    trees: treeConfigs,
 }

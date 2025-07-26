@@ -1,8 +1,4 @@
 // Village Area (Safe Zone)
-import Tree from '../classes/Tree.js';
-import House from '../classes/House.js';
-import Wall from '../classes/Wall.js';
-
 const canvasWidth = 540; // Width of village interior
 const canvasHeight = 566; // Height of village interior
 
@@ -17,17 +13,15 @@ export const canvasConfigs = {
 
   playerX: 270, // Center horizontally
   playerY: 283, // Center vertically
-};
 
-//  background configuration
-export const backgroundConfigs = {
-  backgroundColor: '#8B4513', // Sandy brown
-  accentColor: '#A0522D', // Sienna brown
+  backgroundColor: '#478120ff', // Forest green
+  accentColor: '#294f0cff', // Darker green
   theme: 'village',
 };
 
+
 // Village house configurations
-const houseConfigs = [
+export const houseConfigs = [
   {
     x: 100, y: 70, type: 'normal', name: 'House 1',
   },
@@ -48,8 +42,19 @@ const houseConfigs = [
   },
 ];
 
+export const EntryConfgs = [
+  {
+    x: 180,
+    y: 0,
+    width: 180,
+    height: 16,
+    name: 'North opening (gap)',
+    destinationLevel: 2,
+  },
+];
+
 // Village wall configurations
-const wallConfigs = [
+export const wallConfigs = [
   // North wall with opening in the middle
   {
     x: 0, y: 0, width: 180, height: 16, isOpening: false, name: 'North wall left section',
@@ -84,7 +89,7 @@ const wallConfigs = [
 ];
 
 // Village decorative tree configurations
-const treeConfigs = [
+export const treeConfigs = [
   // Corner trees for natural village boundaries
   { x: 50, y: 50, area: 'Northwest corner' },
   { x: 480, y: 45, area: 'Northeast corner' },
@@ -113,30 +118,10 @@ const treeConfigs = [
   { x: 380, y: 450, area: 'South village area' },
 ];
 
-export function initialize(game) {
-  // Clear existing entities
-  game.enemies = [];
-  game.items = [];
-  game.trees = [];
-  game.mountains = [];
-  game.stalactites = [];
-  game.houses = [];
-  game.walls = [];
-
-  // Village is a safe zone - no enemies!
-
-  // Create houses from configuration
-  houseConfigs.forEach((config) => {
-    game.houses.push(new House(config.x, config.y, config.type));
-  });
-
-  // Create walls from configuration
-  wallConfigs.forEach((config) => {
-    game.walls.push(new Wall(config.x, config.y, config.width, config.height, config.isOpening));
-  });
-
-  // Create decorative trees from configuration
-  treeConfigs.forEach((config) => {
-    game.trees.push(new Tree(config.x, config.y));
-  });
+export default {
+  ...canvasConfigs,
+  houses: houseConfigs,
+  walls: wallConfigs,
+  trees: treeConfigs,
+  entries: EntryConfgs,
 }

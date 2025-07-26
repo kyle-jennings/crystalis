@@ -2,6 +2,29 @@
 
 // Base Effect class
 export class Effect {
+  static constructorParams = {
+    x: {
+      type: 'number',
+      description: 'X position of the effect',
+    },
+    y: {
+      type: 'number',
+      description: 'Y position of the effect',
+    },
+    duration: {
+      type: 'number',
+      description: 'Total duration of the effect in seconds',
+    },
+    life: {
+      type: 'number',
+      description: 'Time remaining for the effect',
+    },
+    shouldRemove: {
+      type: 'boolean',
+      description: 'Flag to mark for removal from game',
+    },
+  };
+
   constructor(x, y, duration) {
     this.x = x;
     this.y = y;
@@ -19,6 +42,29 @@ export class Effect {
 }
 
 export class HitEffect extends Effect {
+  static constructorParams = {
+    x: {
+      type: 'number',
+      description: 'X position of the hit effect',
+    },
+    y: {
+      type: 'number',
+      description: 'Y position of the hit effect',
+    },
+    duration: {
+      type: 'number',
+      description: 'Duration of hit effect (0.3 seconds)',
+    },
+    life: {
+      type: 'number',
+      description: 'Time remaining for the effect (inherited)',
+    },
+    shouldRemove: {
+      type: 'boolean',
+      description: 'Flag to mark for removal (inherited)',
+    },
+  };
+
   constructor(x, y) {
     super(x, y, 0.3);
   }
@@ -37,6 +83,29 @@ export class HitEffect extends Effect {
 }
 
 export class HealEffect extends Effect {
+  static constructorParams = {
+    x: {
+      type: 'number',
+      description: 'X position of the heal effect',
+    },
+    y: {
+      type: 'number',
+      description: 'Y position of the heal effect',
+    },
+    duration: {
+      type: 'number',
+      description: 'Duration of heal effect (1.0 seconds)',
+    },
+    life: {
+      type: 'number',
+      description: 'Time remaining for the effect (inherited)',
+    },
+    shouldRemove: {
+      type: 'boolean',
+      description: 'Flag to mark for removal (inherited)',
+    },
+  };
+
   constructor(x, y) {
     super(x, y, 1.0);
   }
@@ -57,6 +126,37 @@ export class HealEffect extends Effect {
 
 // Melee Attack Effect
 export class MeleeAttackEffect extends Effect {
+  static constructorParams = {
+    x: {
+      type: 'number',
+      description: 'X position of the melee attack effect',
+    },
+    y: {
+      type: 'number',
+      description: 'Y position of the melee attack effect',
+    },
+    duration: {
+      type: 'number',
+      description: 'Duration of attack effect (0.2 seconds)',
+    },
+    life: {
+      type: 'number',
+      description: 'Time remaining for the effect (inherited)',
+    },
+    shouldRemove: {
+      type: 'boolean',
+      description: 'Flag to mark for removal (inherited)',
+    },
+    angle: {
+      type: 'number',
+      description: 'Direction of the attack slash in radians',
+    },
+    size: {
+      type: 'number',
+      description: 'Size of the attack effect (fixed at 16)',
+    },
+  };
+
   constructor(x, y, angle) {
     super(x, y, 0.2); // Short duration for melee effect
     this.angle = angle;

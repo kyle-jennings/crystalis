@@ -1,5 +1,48 @@
 // House.js - House class for village buildings
 export default class House {
+  static constructorParams = {
+    x: {
+      type: 'number',
+      description: 'X position of the house',
+    },
+    y: {
+      type: 'number',
+      description: 'Y position of the house',
+    },
+    width: {
+      type: 'number',
+      description: 'Width of the house (fixed at 64)',
+    },
+    height: {
+      type: 'number',
+      description: 'Height of the house (fixed at 48)',
+    },
+    style: {
+      type: 'string',
+      description: 'House style: normal, shop, inn, temple, etc.',
+    },
+    type: {
+      type: 'string',
+      description: 'Type identifier for this object (always "house")',
+    },
+    collisionX: {
+      type: 'number',
+      description: 'X position of collision box (full house area)',
+    },
+    collisionY: {
+      type: 'number',
+      description: 'Y position of collision box (full house area)',
+    },
+    collisionWidth: {
+      type: 'number',
+      description: 'Width of collision box',
+    },
+    collisionHeight: {
+      type: 'number',
+      description: 'Height of collision box',
+    },
+  };
+
   constructor(x, y, style = 'normal') {
     this.x = x;
     this.y = y;

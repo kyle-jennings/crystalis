@@ -14,17 +14,13 @@ export const canvasConfigs = {
   worldHeight: 768,
   playerX: 256,
   playerY: 400,
-};
-
-// background configuration
-export const backgroundConfigs = {
   backgroundColor: '#1a1a1a', // Dark cave
   accentColor: '#2a2a2a', // Slightly lighter
   theme: 'cave',
 };
 
 // Cave enemy configurations
-const enemyConfigs = [
+export const enemyConfigs = [
   // Cave entrance area enemies
   {
     type: 'Slime', x: 200, y: 300, area: 'Cave entrance',
@@ -69,7 +65,7 @@ const enemyConfigs = [
 ];
 
 // Cave item configurations
-const itemConfigs = [
+export const itemConfigs = [
   {
     x: 180, y: 180, value: 8, description: 'Higher value in caves',
   },
@@ -94,7 +90,7 @@ const itemConfigs = [
 ];
 
 // Cave mountain configurations (rock formations/cave walls)
-const mountainConfigs = [
+export const mountainConfigs = [
   {
     x: 150, y: 50, hasPortal: false, portalDestination: null, description: 'North chamber wall',
   },
@@ -116,7 +112,7 @@ const mountainConfigs = [
 ];
 
 // Cave stalactite configurations
-const stalactiteConfigs = [
+export const stalactiteConfigs = [
   // Entry chamber stalactites
   {
     x: 120, y: 100, isHanging: true, description: 'Stalactite (hanging)',
@@ -177,37 +173,10 @@ const stalactiteConfigs = [
   },
 ];
 
-export function initialize(game) {
-  // Clear existing entities
-  game.enemies = [];
-  game.items = [];
-  game.trees = [];
-  game.mountains = [];
-  game.stalactites = [];
-  game.houses = [];
-  game.walls = [];
-
-  // Create enemies from configuration
-  enemyConfigs.forEach((config) => {
-    if (config.type === 'Slime') {
-      game.enemies.push(new Slime(config.x, config.y));
-    } else if (config.type === 'Ant') {
-      game.enemies.push(new Ant(config.x, config.y));
-    }
-  });
-
-  // Create items from configuration
-  itemConfigs.forEach((config) => {
-    game.items.push(new ExperienceOrb(config.x, config.y, config.value));
-  });
-
-  // Create mountains from configuration
-  mountainConfigs.forEach((config) => {
-    game.mountains.push(new Mountain(config.x, config.y, config.hasPortal, config.portalDestination));
-  });
-
-  // Create stalactites from configuration
-  stalactiteConfigs.forEach((config) => {
-    game.stalactites.push(new Stalactite(config.x, config.y, config.isHanging));
-  });
+export default {
+    ...canvasConfigs,
+    enemyConfigs: enemyConfigs,
+    items: itemConfigs,
+    mountains: mountainConfigs,
+    stalactites: stalactiteConfigs,
 }

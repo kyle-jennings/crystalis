@@ -1,5 +1,44 @@
 // Cave.js - Cave wall/formation class for cave levels
 export default class Cave {
+  static constructorParams = {
+    x: {
+      type: 'number',
+      description: 'X position of the cave formation',
+    },
+    y: {
+      type: 'number',
+      description: 'Y position of the cave formation',
+    },
+    width: {
+      type: 'number',
+      description: 'Width of the cave formation',
+    },
+    height: {
+      type: 'number',
+      description: 'Height of the cave formation',
+    },
+    type: {
+      type: 'string',
+      description: 'Type identifier for this object (always "cave")',
+    },
+    enemyCollisionX: {
+      type: 'number',
+      description: 'X position of enemy collision box',
+    },
+    enemyCollisionY: {
+      type: 'number',
+      description: 'Y position of enemy collision box',
+    },
+    enemyCollisionWidth: {
+      type: 'number',
+      description: 'Width of enemy collision box',
+    },
+    enemyCollisionHeight: {
+      type: 'number',
+      description: 'Height of enemy collision box',
+    },
+  };
+  
   constructor(x, y) {
     this.x = x;
     this.y = y;

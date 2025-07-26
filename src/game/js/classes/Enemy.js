@@ -2,6 +2,53 @@
 
 // Base Enemy class
 export class Enemy {
+  static constructorParams = {
+    x: {
+      type: 'number',
+      description: 'X position of the enemy',
+    },
+    y: {
+      type: 'number',
+      description: 'Y position of the enemy',
+    },
+    width: {
+      type: 'number',
+      description: 'Width of enemy sprite (fixed at 16)',
+    },
+    height: {
+      type: 'number',
+      description: 'Height of enemy sprite (fixed at 16)',
+    },
+    hp: {
+      type: 'number',
+      description: 'Current hit points',
+    },
+    maxHp: {
+      type: 'number',
+      description: 'Maximum hit points',
+    },
+    damage: {
+      type: 'number',
+      description: 'Damage dealt to player on contact',
+    },
+    expValue: {
+      type: 'number',
+      description: 'Experience points given when defeated',
+    },
+    speed: {
+      type: 'number',
+      description: 'Movement speed',
+    },
+    animFrame: {
+      type: 'number',
+      description: 'Current animation frame',
+    },
+    animTime: {
+      type: 'number',
+      description: 'Animation timing counter',
+    },
+  };
+
   constructor(x, y, hp, damage, expValue) {
     this.x = x;
     this.y = y;
@@ -190,6 +237,57 @@ export class Enemy {
 }
 
 export class Slime extends Enemy {
+  static constructorParams = {
+    x: {
+      type: 'number',
+      description: 'X position of the slime',
+    },
+    y: {
+      type: 'number',
+      description: 'Y position of the slime',
+    },
+    width: {
+      type: 'number',
+      description: 'Width of slime sprite (inherited)',
+    },
+    height: {
+      type: 'number',
+      description: 'Height of slime sprite (inherited)',
+    },
+    hp: {
+      type: 'number',
+      description: 'Hit points (8 for slimes)',
+    },
+    maxHp: {
+      type: 'number',
+      description: 'Maximum hit points (8 for slimes)',
+    },
+    damage: {
+      type: 'number',
+      description: 'Damage dealt (2 for slimes)',
+    },
+    expValue: {
+      type: 'number',
+      description: 'Experience points given (3 for slimes)',
+    },
+    speed: {
+      type: 'number',
+      description: 'Movement speed (0.5 for slimes)',
+    },
+    animFrame: {
+      type: 'number',
+      description: 'Current animation frame (inherited)',
+    },
+    animTime: {
+      type: 'number',
+      description: 'Animation timing counter (inherited)',
+    },
+    color: {
+      type: 'string',
+      description: 'Slime color (light green)',
+    },
+  };
+
   constructor(x, y) {
     super(x, y, 8, 2, 3);
     this.color = '#90EE90'; // Light green
@@ -198,6 +296,57 @@ export class Slime extends Enemy {
 }
 
 export class Ant extends Enemy {
+  static constructorParams = {
+    x: {
+      type: 'number',
+      description: 'X position of the ant',
+    },
+    y: {
+      type: 'number',
+      description: 'Y position of the ant',
+    },
+    width: {
+      type: 'number',
+      description: 'Width of ant sprite (inherited)',
+    },
+    height: {
+      type: 'number',
+      description: 'Height of ant sprite (inherited)',
+    },
+    hp: {
+      type: 'number',
+      description: 'Hit points (6 for ants)',
+    },
+    maxHp: {
+      type: 'number',
+      description: 'Maximum hit points (6 for ants)',
+    },
+    damage: {
+      type: 'number',
+      description: 'Damage dealt (1 for ants)',
+    },
+    expValue: {
+      type: 'number',
+      description: 'Experience points given (2 for ants)',
+    },
+    speed: {
+      type: 'number',
+      description: 'Movement speed (1.5 for ants)',
+    },
+    animFrame: {
+      type: 'number',
+      description: 'Current animation frame (inherited)',
+    },
+    animTime: {
+      type: 'number',
+      description: 'Animation timing counter (inherited)',
+    },
+    color: {
+      type: 'string',
+      description: 'Ant color (saddle brown)',
+    },
+  };
+
   constructor(x, y) {
     super(x, y, 6, 1, 2);
     this.color = '#8B4513'; // Saddle brown

@@ -1,6 +1,49 @@
 // Projectile.js - Projectile classes for Crystalis game
 
 export class SwordProjectile {
+  static constructorParams = {
+    x: {
+      type: 'number',
+      description: 'X position of the projectile',
+    },
+    y: {
+      type: 'number',
+      description: 'Y position of the projectile',
+    },
+    angle: {
+      type: 'number',
+      description: 'Direction of travel in radians',
+    },
+    speed: {
+      type: 'number',
+      description: 'Movement speed of the projectile',
+    },
+    damage: {
+      type: 'number',
+      description: 'Damage dealt on impact',
+    },
+    swordType: {
+      type: 'string',
+      description: 'Element type of the sword (Wind, Fire, etc.)',
+    },
+    friendly: {
+      type: 'boolean',
+      description: 'Whether this projectile is player-fired',
+    },
+    shouldRemove: {
+      type: 'boolean',
+      description: 'Flag to mark for removal from game',
+    },
+    life: {
+      type: 'number',
+      description: 'Time remaining before auto-removal (0.5 seconds)',
+    },
+    size: {
+      type: 'number',
+      description: 'Size of the projectile sprite',
+    },
+  };
+
   constructor(x, y, angle, swordType) {
     this.x = x;
     this.y = y;

@@ -10,7 +10,6 @@ import '@types/interfaces';
 import GameEnrionmentObjects from '@game/js/lib/objectMappings';
 import useLevelEditor from '@/composables/useLevelEditor';
 
-console.log(GameEnrionmentObjects);
 const selectedObject = ref<any>(null); // Store reference to currently selected object
 const toolPreviewCanvas = ref<HTMLCanvasElement>();
 const formValues = ref<Record<string, any>>({}); // Store form input values

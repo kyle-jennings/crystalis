@@ -1,5 +1,40 @@
 // Entry.js - Invisible collision areas for level transitions
 export default class Entry {
+    static constructorParams = {
+        x: {
+            type: 'number',
+            description: 'X position of the entry area',
+        },
+        y: {
+            type: 'number',
+            description: 'Y position of the entry area',
+        },
+        width: {
+            type: 'number',
+            description: 'Width of the entry area (default 32)',
+        },
+        height: {
+            type: 'number',
+            description: 'Height of the entry area (default 32)',
+        },
+        destinationLevel: {
+            type: 'number',
+            description: 'Level ID to transition to (default 1)',
+        },
+        destinationX: {
+            type: 'number|null',
+            description: 'X spawn position in destination (null = use default)',
+        },
+        destinationY: {
+            type: 'number|null',
+            description: 'Y spawn position in destination (null = use default)',
+        },
+        type: {
+            type: 'string',
+            description: 'Type identifier for this object (always "entry")',
+        },
+    };
+
     constructor(x, y, width = 32, height = 32, destinationLevel = 1, destinationX = null, destinationY = null) {
         this.x = x;
         this.y = y;

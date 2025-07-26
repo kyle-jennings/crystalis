@@ -1,5 +1,68 @@
 // Mountain.js - Mountain obstacle class for Crystalis game
 export default class Mountain {
+  static constructorParams = {
+    x: {
+      type: 'number',
+      description: 'X position of the mountain',
+    },
+    y: {
+      type: 'number',
+      description: 'Y position of the mountain',
+    },
+    width: {
+      type: 'number',
+      description: 'Width of the mountain (fixed at 80)',
+    },
+    height: {
+      type: 'number',
+      description: 'Height of the mountain (fixed at 60)',
+    },
+    type: {
+      type: 'string',
+      description: 'Type identifier for this object (always "mountain")',
+    },
+    hasCaveOpening: {
+      type: 'boolean',
+      description: 'Whether this mountain has a cave entrance',
+    },
+    caveOpeningDestination: {
+      type: 'number|null',
+      description: 'Level ID to transport to (null if no cave)',
+    },
+    enemyCollisionX: {
+      type: 'number',
+      description: 'X position of enemy collision box',
+    },
+    enemyCollisionY: {
+      type: 'number',
+      description: 'Y position of enemy collision box (bottom part only)',
+    },
+    enemyCollisionWidth: {
+      type: 'number',
+      description: 'Width of enemy collision box',
+    },
+    enemyCollisionHeight: {
+      type: 'number',
+      description: 'Height of enemy collision box',
+    },
+    caveOpeningX: {
+      type: 'number|undefined',
+      description: 'X position of cave opening (if present)',
+    },
+    caveOpeningY: {
+      type: 'number|undefined',
+      description: 'Y position of cave opening (if present)',
+    },
+    caveOpeningWidth: {
+      type: 'number|undefined',
+      description: 'Width of cave opening (if present)',
+    },
+    caveOpeningHeight: {
+      type: 'number|undefined',
+      description: 'Height of cave opening (if present)',
+    },
+  };
+
   constructor(x, y, hasCaveOpening = false, caveOpeningDestination = null) {
     this.x = x;
     this.y = y;
