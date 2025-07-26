@@ -2,16 +2,10 @@
 /* eslint-disable max-len */
 // Crystalis Clone - First Area Implementation
 
+import CombatSystem from './classes/CombatSystem.js';
 import MagicSystem from './classes/MagicSystem.js';
 import Player from './classes/Player.js';
-// import { Enemy, Slime, Ant } from './classes/Enemy.js';
-import { SwordProjectile } from './classes/Projectile.js';
 import ExperienceOrb from '@game/js/classes/ExperienceOrb.js';
-import {
-  // Effect,
-  HitEffect,
-  MeleeAttackEffect,
-} from './classes/Effect.js';
 import {
   GAME_KEYS, MOVEMENT_KEYS, ACTION_KEYS, INPUT_CONFIG,
 } from './lib/inputMappings.js';
@@ -48,6 +42,7 @@ class CrystalisGame {
     // Player stats and state
     this.player = new Player(256, 400); // Start in center of first area
     this.magicSystem = new MagicSystem(this.player, this);
+    this.combatSystem = new CombatSystem(this.player, this);
     
     // Game entities
     this.enemies = [];
@@ -158,12 +153,12 @@ class CrystalisGame {
           console.log('Firing projectile...');
           const projectileData = this.player.attack();
           console.log('Projectile data:', projectileData);
-          this.createSwordAttack(projectileData);
+          this.combatSystem.createSwordAttack(projectileData);
           this.lastAttackTime = this.gameTime;
         } else {
           // Short press - perform melee attack
           console.log('Performing melee attack');
-          this.performMeleeAttack();
+          this.combatSystem.performMeleeAttack();
           this.lastAttackTime = this.gameTime;
         }
 
@@ -235,7 +230,7 @@ class CrystalisGame {
       if (this.enemiesCanMove) {
         enemy.update(this.player);
 
-        // Check for tree collisions and handle them
+        // Check for collisions and handle them
         const collidingTree = enemy.checkTreeCollisions(this.trees);
         const collidingMountain = enemy.checkMountainCollisions(this.mountains);
         const collidingStalactite = enemy.checkStalactiteCollisions(this.stalactites);
@@ -386,98 +381,6 @@ class CrystalisGame {
     }
   }
 
-  createSwordAttack(projectileData) {
-    console.log('Creating sword attack with data:', projectileData);
-    // Create sword projectile using data from player's attack method
-    const projectile = new SwordProjectile(
-      projectileData.x,
-      projectileData.y,
-      projectileData.angle,
-      projectileData.swordType,
-    );
-    this.projectiles.push(projectile);
-    console.log('Projectile created and added. Total projectiles:', this.projectiles.length);
-  }
-
-  performMeleeAttack() {
-    // Trigger player attack animation
-    this.player.attack();
-
-    // Calculate melee attack area based on player facing direction
-    const meleeRange = this.player.width; // Same width as player
-    const angle = ((this.player.facing * Math.PI) / 4) - (Math.PI / 2);
-
-    // Calculate attack position in front of player
-    const attackX = this.player.x + (this.player.width / 2) + Math.cos(angle) * meleeRange;
-    const attackY = this.player.y + (this.player.height / 2) + Math.sin(angle) * meleeRange;
-
-    // Check for enemies in melee range
-    for (const enemy of this.enemies) {
-      const distance = this.getDistance(
-        { x: attackX, y: attackY },
-        { x: enemy.x + enemy.width / 2, y: enemy.y + enemy.height / 2 },
-      );
-
-      // If enemy is within melee range
-      if (distance <= meleeRange) {
-        // Calculate knockback direction (from player to enemy)
-        const knockbackStrength = 50; // pixels to knockback - increased from 15
-        const dx = (enemy.x + enemy.width / 2) - (this.player.x + this.player.width / 2);
-        const dy = (enemy.y + enemy.height / 2) - (this.player.y + this.player.height / 2);
-        const length = Math.sqrt(dx * dx + dy * dy);
-
-        // Normalize and apply knockback
-        const knockbackX = length > 0 ? (dx / length) * knockbackStrength : 0;
-        const knockbackY = length > 0 ? (dy / length) * knockbackStrength : 0;
-
-        enemy.takeDamage(this.player.attackPower, knockbackX, knockbackY);
-        this.effects.push(new HitEffect(enemy.x + enemy.width / 2, enemy.y + enemy.height / 2));
-        console.log('Melee hit enemy for', this.player.attackPower, 'damage with knockback');
-      }
-    }
-
-    // Create visual effect for melee attack
-    this.effects.push(new MeleeAttackEffect(attackX, attackY, angle));
-  }
-
-  drawChargeIndicator() {
-    if (this.isCharging) {
-      const chargeTime = this.gameTime - this.chargeStartTime;
-
-      // Only show indicator after the delay
-      if (chargeTime >= this.chargeIndicatorDelay) {
-        const chargeProgress = Math.min(chargeTime / this.chargeRequiredTime, 1.0);
-
-        // Draw charge bar at bottom of screen
-        const barWidth = 200;
-        const barHeight = 20;
-        const barX = (this.width - barWidth) / 2;
-        const barY = this.height - 40;
-
-        // Background
-        this.ctx.fillStyle = '#333';
-        this.ctx.fillRect(barX, barY, barWidth, barHeight);
-
-        // Border
-        this.ctx.strokeStyle = '#fff';
-        this.ctx.lineWidth = 2;
-        this.ctx.strokeRect(barX, barY, barWidth, barHeight);
-
-        // Charge progress
-        const fillWidth = barWidth * chargeProgress;
-        this.ctx.fillStyle = chargeProgress >= 1.0 ? '#00ff00' : '#ffff00';
-        this.ctx.fillRect(barX, barY, fillWidth, barHeight);
-
-        // Text
-        this.ctx.fillStyle = '#fff';
-        this.ctx.font = '14px Courier New';
-        this.ctx.textAlign = 'center';
-        const text = chargeProgress >= 1.0 ? 'READY!' : 'Charging...';
-        this.ctx.fillText(text, this.width / 2, barY - 5);
-      }
-    }
-  }
-
   checkCollisions() {
     // Player vs Enemies - check both types of invulnerability
     for (const enemy of this.enemies) {
@@ -488,25 +391,8 @@ class CrystalisGame {
       }
     }
 
-    // Projectiles vs Enemies
-    for (const projectile of this.projectiles) {
-      if (projectile.friendly) {
-        for (const enemy of this.enemies) {
-          if (this.getDistance(projectile, enemy) < 20) {
-            // Calculate knockback direction (projectile direction)
-            const knockbackStrength = 35; // Stronger knockback for projectiles - increased from 20
-            const knockbackX = Math.cos(projectile.angle) * knockbackStrength;
-            const knockbackY = Math.sin(projectile.angle) * knockbackStrength;
-
-            enemy.takeDamage(projectile.damage, knockbackX, knockbackY);
-            projectile.shouldRemove = true;
-            this.effects.push(new HitEffect(enemy.x, enemy.y));
-            console.log('Projectile hit enemy with knockback');
-            break;
-          }
-        }
-      }
-    }
+    // Use combat system for projectile collisions
+    this.combatSystem.checkProjectileCollisions();
   }
 
   updateCamera() {
@@ -604,7 +490,7 @@ class CrystalisGame {
     this.ctx.restore();
 
     // Draw charge indicator (after camera transformation)
-    this.drawChargeIndicator();
+    this.combatSystem.drawChargeIndicator();
   }
 
   drawBackground() {
