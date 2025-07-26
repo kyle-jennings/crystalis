@@ -470,11 +470,11 @@ class CrystalisGame {
   }
 
   updateCamera() {
-    // Get level instance or fall back to legacy configs
-    const levelInstance = this.Level?.level;
+    // this.Level is already the LevelBuilder instance
+    const levelInstance = this.Level;
     
     if (levelInstance) {
-      // Using new Level class
+      // Using Level class
       // If level canvas size matches world size, use fixed camera (like village)
       if (levelInstance.canvasWidth === levelInstance.worldWidth
               && levelInstance.canvasHeight === levelInstance.worldHeight) {
@@ -491,24 +491,13 @@ class CrystalisGame {
         this.camera.y = Math.max(0, Math.min(this.camera.y, this.worldHeight - this.height));
       }
     } else {
-      // Fall back to legacy format
-      const levelConfigs = this.Level?.canvasConfigs || {};
+      // Fallback - center on player
+      this.camera.x = this.player.x - this.width / 2;
+      this.camera.y = this.player.y - this.height / 2;
 
-      // If level canvas size matches world size, use fixed camera (like village)
-      if (levelConfigs.canvasWidth === levelConfigs.worldWidth
-              && levelConfigs.canvasHeight === levelConfigs.worldHeight) {
-        // Fixed camera - show entire level
-        this.camera.x = 0;
-        this.camera.y = 0;
-      } else {
-        // Dynamic camera - center on player
-        this.camera.x = this.player.x - this.width / 2;
-        this.camera.y = this.player.y - this.height / 2;
-
-        // Clamp camera to world bounds
-        this.camera.x = Math.max(0, Math.min(this.camera.x, this.worldWidth - this.width));
-        this.camera.y = Math.max(0, Math.min(this.camera.y, this.worldHeight - this.height));
-      }
+      // Clamp camera to world bounds
+      this.camera.x = Math.max(0, Math.min(this.camera.x, this.worldWidth - this.width));
+      this.camera.y = Math.max(0, Math.min(this.camera.y, this.worldHeight - this.height));
     }
   }
 
@@ -617,20 +606,19 @@ class CrystalisGame {
   }
 
   drawBackground() {
-    // Get level instance or fall back to legacy configs
-    const levelInstance = this.Level?.level;
+    // this.Level is already the LevelBuilder instance
+    const levelInstance = this.Level;
     
     let backgroundColor, accentColor;
     
     if (levelInstance) {
-      // Using new Level class
+      // Using Level class
       backgroundColor = levelInstance.backgroundColor;
       accentColor = levelInstance.accentColor;
     } else {
-      // Fall back to legacy format
-      const backgroundConfigs = this.Level?.backgroundConfigs || {};
-      backgroundColor = backgroundConfigs.backgroundColor || '#2d5016'; // Default to forest green
-      accentColor = backgroundConfigs.accentColor || '#1a3009'; // Default to darker green
+      // Fallback defaults
+      backgroundColor = '#2d5016'; // Default to forest green
+      accentColor = '#1a3009'; // Default to darker green
     }
 
     // Draw background

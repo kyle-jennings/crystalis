@@ -100,13 +100,13 @@ export const mountainConfigs = [
     x: 850, y: 100, hasPortal: false, portalDestination: null, description: 'Upper right area',
   },
   {
-    x: 300, y: 650, hasPortal: true, portalDestination: 2, description: 'Lower middle - PORTAL TO LEVEL 2',
+    x: 300, y: 650, hasPortal: true, portalDestination: 3, description: 'Lower middle - PORTAL TO LEVEL 2',
   },
 ];
 
 export default {
     ...canvasConfigs,
-    enemyConfigs: enemyConfigs,
+    enemies: enemyConfigs,
     items: itemConfigs,
     mountains: mountainConfigs,
     trees: treeConfigs,

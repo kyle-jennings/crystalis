@@ -122,7 +122,7 @@ export default class LevelBuilder {
     game.items = this.items.map(config => new ExperienceOrb(config.x, config.y, config.value));
     game.trees = this.trees.map(config => new Tree(config.x, config.y));
     game.mountains = this.mountains.map(config => new Mountain(config.x, config.y, config.hasPortal, config.portalDestination));
-    game.stalactites = this.stalactites.map(config => new new Stalactite(config.x, config.y, config.isHanging));
+    game.stalactites = this.stalactites.map(config => new Stalactite(config.x, config.y, config.isHanging));
     game.houses = this.houses.map(config => new House(config.x, config.y, config.type));
     game.walls = this.walls
       .filter(config => !config.isOpening)

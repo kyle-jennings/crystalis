@@ -175,7 +175,7 @@ export const stalactiteConfigs = [
 
 export default {
     ...canvasConfigs,
-    enemyConfigs: enemyConfigs,
+    enemies: enemyConfigs,
     items: itemConfigs,
     mountains: mountainConfigs,
     stalactites: stalactiteConfigs,
