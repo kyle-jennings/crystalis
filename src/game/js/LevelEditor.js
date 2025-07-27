@@ -399,6 +399,16 @@ export default class LevelEditor extends CrystalisGame {
       stalactite.draw(this.ctx);
     }
 
+    // Draw caves (cave areas)
+    for (const cave of this.caves) {
+      cave.draw(this.ctx);
+    }
+
+    // Draw entries (level transitions) - only visible in edit mode
+    for (const entry of this.entries) {
+      entry.draw(this.ctx, this.isEditMode);
+    }
+
     // Skip drawing dynamic entities in edit mode
     if (!this.isEditMode) {
       // Draw items
