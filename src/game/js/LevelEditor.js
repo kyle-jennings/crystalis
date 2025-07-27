@@ -271,13 +271,13 @@ export default class LevelEditor extends CrystalisGame {
       // Draw charge indicator (after camera transformation)
       this.combatSystem.drawChargeIndicator();
     }
+
+    this.drawGrid()
   }
 
   updateUI() {
     if (this.isEditMode) return;
   }
-
-
 
   loadLevel(levelNumber) {
     // Set current level object
@@ -310,4 +310,28 @@ export default class LevelEditor extends CrystalisGame {
     
     console.log(`Loaded Level ${this.currentLevel}`);
   }
+
+  drawGrid() {
+    this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+    this.ctx.lineWidth = 0.5;
+
+    const gridSize = 32;
+
+    // Vertical lines
+    for (let x = 0; x <= this.worldWidth; x += gridSize) {
+      this.ctx.beginPath();
+      this.ctx.moveTo(x, 0);
+      this.ctx.lineTo(x, this.worldHeight);
+      this.ctx.stroke();
+    }
+
+    // Horizontal lines
+    for (let y = 0; y <= this.worldHeight; y += gridSize) {
+      this.ctx.beginPath();
+      this.ctx.moveTo(0, y);
+      this.ctx.lineTo(this.worldWidth, y);
+      this.ctx.stroke();
+    }
+  }
+
 }
