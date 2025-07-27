@@ -15,10 +15,6 @@
 		{
 			"name": "Bulmaswatch",
 			"path": "node_modules/bulmaswatch"
-		},
-		{
-			"name": "old work",
-			"path": "./vanilla-js"
 		}
 	],
 	"settings": {
@@ -31,8 +27,7 @@
 		"files.exclude": {
 			"**/.git": true,
 			"**/.DS_Store": true,
-			"**/node_modules": true,
-			"vanilla-js": true
+			"**/node_modules": true
 		}
 	},
 }
