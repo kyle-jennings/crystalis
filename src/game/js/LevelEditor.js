@@ -6,6 +6,83 @@ import CrystalisGame from '@/game/js/CrystalisGame.js';
 
 export default class LevelEditor extends CrystalisGame {
 
+  constructor(userConfigs = {}) {
+    super(userConfigs);
+    
+    // Set up click event listeners for edit mode
+    if (this.isEditMode) {
+      this.setupEditModeListeners();
+    }
+  }
+
+  setupEditModeListeners() {
+    this.canvas.addEventListener('click', (e) => {
+      const rect = this.canvas.getBoundingClientRect();
+      const clickX = e.clientX - rect.left + this.camera.x;
+      const clickY = e.clientY - rect.top + this.camera.y;
+      
+      console.log(`Clicked at world coordinates: (${clickX}, ${clickY})`);
+      
+      // Check what was clicked on
+      this.identifyClickedEntity(clickX, clickY);
+    });
+  }
+
+  identifyClickedEntity(x, y) {
+    // Check houses
+    const objects = [
+      this.houses,
+      this.walls,
+      this.trees,
+      this.mountains,
+      this.stalactites,
+      this.caves,
+      this.entries,
+    ];
+    
+    // objects.forEach((objArr) => {
+    for (const objArr of objects) {
+      for (const obj of objArr) {
+        if (this.isPointInEntity(x, y, obj)) {
+          this.logEntityDetails(obj);
+          return;
+        }
+      }
+    }
+
+
+    // If nothing was clicked, log the empty space
+    console.log('=== EMPTY SPACE CLICKED ===');
+    console.log(`Empty space at coordinates: (${x}, ${y})`);
+  }
+
+  isPointInEntity(x, y, entity) {
+    // Most entities have x, y, width, height properties
+    const entityX = entity.x || 0;
+    const entityY = entity.y || 0;
+    const entityWidth = entity.width || 32; // Default width
+    const entityHeight = entity.height || 32; // Default height
+
+    return x >= entityX && x <= entityX + entityWidth &&
+           y >= entityY && y <= entityY + entityHeight;
+  }
+
+  logEntityDetails(entity) {
+    const obj = {};
+    console.log(`--- ${entity.type || 'Entity'} ---`);
+
+    // Try to access constructorParams if available
+    if (entity.constructor && entity.constructor.constructorParams) {
+      // console.log('--- Constructor Parameters ---');
+      for (const [param, config] of Object.entries(entity.constructor.constructorParams)) {
+        const currentValue = entity[param];
+        obj[param] = `${currentValue} (${config.type}) - ${config.description}`;
+        // console.log(`${param}: ${currentValue} (${config.type}) - ${config.description}`);
+      }
+      console.log(obj);
+    }
+  }
+
   update() {
     this.gameTime += 1 / 60;
 
