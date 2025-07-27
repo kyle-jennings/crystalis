@@ -1,18 +1,75 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed } from 'vue';
+import useLevelEditorStore from '@/stores/levelEditorStore';
 
 // Use the Pinia store
+const store = useLevelEditorStore();
 
-// Level settings
-const levelWidth = ref(1024);
-const levelHeight = ref(768);
+// Computed properties that sync with the current game instance
+const levelWidth = computed({
+  get: () => (store.gameInstance as any)?.worldWidth || 1024,
+  set: (value) => {
+    if (store.gameInstance) {
+      (store.gameInstance as any).worldWidth = value;
+      if ((store.gameInstance as any).Level) {
+        (store.gameInstance as any).Level.worldWidth = value;
+      }
+    }
+  },
+});
 
-// Camera settings
-const cameraWidth = ref(800);
-const cameraHeight = ref(600);
+const levelHeight = computed({
+  get: () => (store.gameInstance as any)?.worldHeight || 768,
+  set: (value) => {
+    if (store.gameInstance) {
+      (store.gameInstance as any).worldHeight = value;
+      if ((store.gameInstance as any).Level) {
+        (store.gameInstance as any).Level.worldHeight = value;
+      }
+    }
+  },
+});
+
+// Camera settings (viewport/logical dimensions)
+const cameraWidth = computed({
+  get: () => (store.gameInstance as any)?.width || 800,
+  set: (value) => {
+    if (store.gameInstance) {
+      (store.gameInstance as any).width = value;
+      (store.gameInstance as any).canvas.width = value;
+      if ((store.gameInstance as any).Level) {
+        (store.gameInstance as any).Level.width = value;
+        (store.gameInstance as any).Level.canvasWidth = value;
+      }
+    }
+  },
+});
+
+const cameraHeight = computed({
+  get: () => (store.gameInstance as any)?.height || 600,
+  set: (value) => {
+    if (store.gameInstance) {
+      (store.gameInstance as any).height = value;
+      (store.gameInstance as any).canvas.height = value;
+      if ((store.gameInstance as any).Level) {
+        (store.gameInstance as any).Level.height = value;
+        (store.gameInstance as any).Level.canvasHeight = value;
+      }
+    }
+  },
+});
 
 // Background color
-const backgroundColor = ref('#2c3e50');
+const backgroundColor = computed({
+  get: () => (store.gameInstance as any)?.Level?.backgroundColor || '#2c3e50',
+  set: (value) => {
+    if ((store.gameInstance as any)?.Level) {
+      (store.gameInstance as any).Level.backgroundColor = value;
+      // Trigger a re-render
+      (store.gameInstance as any).render();
+    }
+  },
+});
 </script>
 
 <template>
@@ -93,6 +150,18 @@ const backgroundColor = ref('#2c3e50');
     <hr />
 
     <h4 class="title is-5">Debug Tools</h4>
+
+    <!-- Debug Button -->
+    <b-field>
+      <b-button
+        type="is-info"
+        size="is-small"
+        @click="store.logGameInstance"
+        icon-left="console"
+      >
+        Log Game Object to Console
+      </b-button>
+    </b-field>
   </div>
 </template>
 

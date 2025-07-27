@@ -113,10 +113,17 @@ export default class CrystalisGame {
     this.player.y = this.Level.playerY;
 
     // Adjust canvas size based on level instance
+    // Canvas dimensions: The actual HTML canvas element size (what the user sees)
     this.canvas.width = this.Level.canvasWidth;
     this.canvas.height = this.Level.canvasHeight;
+    
+    // Logical/viewport dimensions: Used for camera calculations and rendering bounds
+    // (Usually same as canvas dimensions, but can be different for scaling scenarios)
     this.width = this.Level.width;
     this.height = this.Level.height;
+    
+    // World dimensions: The total game world size that entities can exist in
+    // (Can be larger than canvas/viewport for scrolling levels)
     this.worldWidth = this.Level.worldWidth;
     this.worldHeight = this.Level.worldHeight;
 
