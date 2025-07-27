@@ -137,16 +137,6 @@ const backgroundColor = computed({
       />
     </b-field>
 
-    <!-- Color Preview -->
-    <b-field label="Preview">
-      <div
-        class="color-preview"
-        :style="{ backgroundColor: backgroundColor }"
-      >
-        Background Color Preview
-      </div>
-    </b-field>
-
     <hr />
 
     <h4 class="title is-5">Debug Tools</h4>

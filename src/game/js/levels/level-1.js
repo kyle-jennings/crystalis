@@ -14,8 +14,8 @@ export const canvasConfigs = {
   playerX: 270, // Center horizontally
   playerY: 283, // Center vertically
 
-  backgroundColor: '#478120ff', // Forest green
-  accentColor: '#294f0cff', // Darker green
+  backgroundColor: '#478120', // Forest green
+  accentColor: '#294f0c', // Darker green
   theme: 'village',
 };
 

@@ -528,31 +528,19 @@ export default class CrystalisGame {
     // this.Level is already the LevelBuilder instance
     const levelInstance = this.Level;
     
-    let backgroundColor, accentColor;
+    let backgroundColor;
     
     if (levelInstance) {
       // Using Level class
       backgroundColor = levelInstance.backgroundColor;
-      accentColor = levelInstance.accentColor;
     } else {
-      // Fallback defaults
+      // Fallback default
       backgroundColor = '#2d5016'; // Default to forest green
-      accentColor = '#1a3009'; // Default to darker green
     }
 
-    // Draw background
+    // Draw solid background
     this.ctx.fillStyle = backgroundColor;
     this.ctx.fillRect(0, 0, this.worldWidth, this.worldHeight);
-
-    // Add some simple terrain details
-    this.ctx.fillStyle = accentColor;
-    for (let x = 0; x < this.worldWidth; x += 64) {
-      for (let y = 0; y < this.worldHeight; y += 64) {
-        if ((x + y) % 128 === 0) {
-          this.ctx.fillRect(x, y, 32, 32);
-        }
-      }
-    }
   }
 
   updateUI() {
