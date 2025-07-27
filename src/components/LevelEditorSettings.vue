@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 
+// Use the Pinia store
+
 // Level settings
 const levelWidth = ref(1024);
 const levelHeight = ref(768);
@@ -87,6 +89,10 @@ const backgroundColor = ref('#2c3e50');
         Background Color Preview
       </div>
     </b-field>
+
+    <hr />
+
+    <h4 class="title is-5">Debug Tools</h4>
   </div>
 </template>
 

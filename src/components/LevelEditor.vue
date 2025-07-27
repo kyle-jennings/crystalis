@@ -40,11 +40,22 @@ onMounted(() => {
     <div id="editor-wrapper">
 
       <b-tabs :animated="false">
+        <b-tab-item label="Settings" icon="cog">
+          <LevelEditorSettings />
+        </b-tab-item>
         <b-tab-item label="Pallet" icon="palette">
           <LevelEditorPallet />
         </b-tab-item>
-        <b-tab-item label="Settings" icon="cog">
-          <LevelEditorSettings />
+        <b-tab-item label="JSON" icon="code">
+          <b-button
+            type="is-info"
+            size="is-small"
+            icon-left="console"
+            label=" Log Game Object to Console"
+            @click="store.logGameInstance"
+          />
+          <hr />
+          <pre>{{ store.jsonSettings }}</pre>
         </b-tab-item>
       </b-tabs>
 

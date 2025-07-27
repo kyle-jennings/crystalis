@@ -15,6 +15,7 @@ export default defineStore(
     const gameInstance = ref(null);
     const selectedTool = ref(null);
     const toolSettings = ref({});
+    const jsonSettings = ref({});
 
     // Level settings state
     const levelSettings = ref({
@@ -78,6 +79,31 @@ export default defineStore(
       selectedEntity.value = null;
     };
 
+    const logGameInstance = () => {
+      /* eslint-disable no-console */
+      if (window.game) {
+        const levelSettingsLocal = {
+          worldWidth: window.game.Level.worldWidth,
+          worldHeight: window.game.Level.worldHeight,
+          canvasWidth: window.game.Level.canvasWidth,
+          canvasHeight: window.game.Level.canvasHeight,
+          playerX: window.game.Level.playerX,
+          playerY: window.game.Level.playerY,
+          backgroundColor: window.game.Level.backgroundColor,
+          houses: window.game.houses?.length || 0,
+          walls: window.game.walls || [],
+          trees: window.game.trees || [],
+          mountains: window.game.mountains || [],
+          stalactites: window.game.stalactites || [],
+          caves: window.game.caves || [],
+          entries: window.game.entries || [],
+        };
+        jsonSettings.value = levelSettingsLocal;
+        console.log('LevelBuilder settings:', levelSettingsLocal);
+      }
+      /* eslint-enable no-console */
+    };
+
     // Watchers
     watch(selectedLevel, (newLevel, oldLevel) => {
       // Only load level if it's actually different and we have a game instance
@@ -89,6 +115,7 @@ export default defineStore(
     // Return all state and actions
     return {
     // State
+      jsonSettings,
       selectedLevel,
       selectedEntity,
       gameInstance,
@@ -105,6 +132,7 @@ export default defineStore(
       setSelectedTool,
       updateToolSettings,
       clearSelectedEntity,
+      logGameInstance,
     };
   },
 );
