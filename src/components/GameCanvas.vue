@@ -1,7 +1,16 @@
 <script setup>
-import '@game/css/styles.css';
-import '@game/js/index.js';
+import {
+  onMounted,
+} from 'vue';
 
+import '@game/css/styles.css';
+import CrystalisGame from '@/game/js/CrystalisGame.js';
+
+onMounted(() => {
+  window.game = new CrystalisGame({
+    $elm: '#gameCanvas',
+  });
+});
 </script>
 
 <template>
@@ -47,6 +56,5 @@ import '@game/js/index.js';
         </div>
       </div>
     </div>
-
   </div>
 </template>

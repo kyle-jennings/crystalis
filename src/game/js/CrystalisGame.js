@@ -16,24 +16,36 @@ import Level1 from './levels/level-1.js';
 import Level2 from './levels/level-2.js';
 import Level3 from './levels/level-3.js';
 
-// Level registry for easy access
-const LEVELS = {
-  1: Level1,
-  2: Level2,
-  3: Level3,
-};
-
-class CrystalisGame {
-  constructor() {
-    this.canvas = document.getElementById('gameCanvas');
+const CONFIG_DEFAULTS = Object.freeze({
+  isEditMode: false,
+  $elm: '#gameCanvas',
+});
+export default class CrystalisGame {
+  constructor(userConfigs = CONFIG_DEFAULTS) {
+    const configs = {
+      isEditMode: false,
+      $elm: '#gameCanvas',
+      ...userConfigs,
+    };
+    this.isEditMode = configs.isEditMode;
+    this.canvas = document.querySelector(configs.$elm);
     this.ctx = this.canvas.getContext('2d');
     this.width = this.canvas.width;
     this.height = this.canvas.height;
 
+
+    // Level registry for easy access
+    this.LEVELS = {
+      1: Level1,
+      2: Level2,
+      3: Level3,
+    };
+
+
     // Game state
     this.currentLevel = 1;
     this.maxLevel = 3;
-    this.Level = null; // Will hold the active level module
+    this.Level = new LevelBuilder(); // Will hold the active level module
     this.gameTime = 0;
     this.camera = { x: 0, y: 0 };
     this.worldWidth = 1024;
@@ -84,16 +96,14 @@ class CrystalisGame {
 
   loadLevel(levelNumber) {
     // Set current level object
-    this.Level = new LevelBuilder(LEVELS[levelNumber]);
+    this.Level.updateConfigs(this.LEVELS[levelNumber]);
 
     if (!this.Level) {
       console.warn(`Level ${levelNumber} not found, loading level 1`);
       // eslint-disable-next-line prefer-destructuring
-      this.Level = LEVELS[1];
+      this.Level.updateConfigs(this.LEVELS[1]);
       this.currentLevel = 1;
     }
-
-    // Get the Level instance if it exists, otherwise fall back to old format
 
     // Using new Level class
     console.log('Loading level using Level class');
@@ -197,6 +207,11 @@ class CrystalisGame {
   update() {
     this.gameTime += 1 / 60;
 
+    // Skip player and enemy updates in edit mode
+    if (this.isEditMode) {
+      return;
+    }
+
     // Handle input
     this.handleInput();
 
@@ -295,6 +310,11 @@ class CrystalisGame {
   }
 
   handleInput() {
+    // Skip input handling in edit mode
+    if (this.isEditMode) {
+      return;
+    }
+
     let { speed } = this.player;
     let dx = 0; let
       dy = 0;
@@ -461,34 +481,40 @@ class CrystalisGame {
       stalactite.draw(this.ctx);
     }
 
-    // Draw items
-    for (const item of this.items) {
-      item.draw(this.ctx);
-    }
+    // Skip drawing dynamic entities in edit mode
+    if (!this.isEditMode) {
+      // Draw items
+      for (const item of this.items) {
+        item.draw(this.ctx);
+      }
 
-    // Draw enemies
-    for (const enemy of this.enemies) {
-      enemy.draw(this.ctx);
-    }
+      // Draw enemies
+      for (const enemy of this.enemies) {
+        enemy.draw(this.ctx);
+      }
 
-    // Draw player
-    this.player.draw(this.ctx);
+      // Draw player
+      this.player.draw(this.ctx);
 
-    // Draw projectiles
-    for (const projectile of this.projectiles) {
-      projectile.draw(this.ctx);
-    }
+      // Draw projectiles
+      for (const projectile of this.projectiles) {
+        projectile.draw(this.ctx);
+      }
 
-    // Draw effects
-    for (const effect of this.effects) {
-      effect.draw(this.ctx);
+      // Draw effects
+      for (const effect of this.effects) {
+        effect.draw(this.ctx);
+      }
     }
 
     // Restore context
     this.ctx.restore();
 
-    // Draw charge indicator (after camera transformation)
-    this.combatSystem.drawChargeIndicator();
+    // Skip charge indicator in edit mode
+    if (!this.isEditMode) {
+      // Draw charge indicator (after camera transformation)
+      this.combatSystem.drawChargeIndicator();
+    }
   }
 
   drawBackground() {
@@ -523,6 +549,7 @@ class CrystalisGame {
   }
 
   updateUI() {
+    if (this.isEditMode) return;
     document.getElementById('level').textContent = this.player.level;
     document.getElementById('currentArea').textContent = this.currentLevel;
     document.getElementById('hp').textContent = this.player.hp;
@@ -577,8 +604,3 @@ class CrystalisGame {
   }
 
 }
-
-// Start the game when page loads
-window.addEventListener('load', () => {
-  window.game = new CrystalisGame();
-});

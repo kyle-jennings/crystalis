@@ -54,7 +54,11 @@ export default class LevelBuilder {
   };
 
   constructor(config = {}) {
-    // Canvas dimensions
+    this.updateConfigs(config);
+  }
+
+  updateConfigs(config = {}) {
+  // Canvas dimensions
     this.canvasWidth = config.canvasWidth || 512;
     this.canvasHeight = config.canvasHeight || 480;
     
