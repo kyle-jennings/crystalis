@@ -84,6 +84,63 @@ const handleDragEnd = () => {
   // Optional: Add visual feedback when drag ends
 };
 
+// Delete selected entity
+const deleteSelectedEntity = () => {
+  if (!store.selectedEntity || !store.gameInstance) {
+    /* eslint-disable-next-line no-console */
+    console.warn('No entity selected or game instance not available');
+    return;
+  }
+
+  const gameInstance = store.gameInstance as any;
+  const selectedEntity = store.selectedEntity as any;
+
+  // Try to use EntityManager if available
+  const entityManager = gameInstance?.entityManager;
+  if (entityManager && entityManager.deleteSelectedEntity) {
+    const success = entityManager.deleteSelectedEntity();
+    if (!success) {
+      /* eslint-disable-next-line no-console */
+      console.error('Failed to delete selected entity');
+    }
+    return;
+  }
+
+  // Fallback: Manual deletion for current implementation
+  const entityArrays = [
+    { name: 'houses', array: gameInstance.houses },
+    { name: 'walls', array: gameInstance.walls },
+    { name: 'trees', array: gameInstance.trees },
+    { name: 'mountains', array: gameInstance.mountains },
+    { name: 'stalactites', array: gameInstance.stalactites },
+    { name: 'caves', array: gameInstance.caves },
+    { name: 'entries', array: gameInstance.entries },
+  ];
+
+  const entityInfo = entityArrays.find(({ array }) => {
+    if (array) {
+      const index = array.indexOf(selectedEntity);
+      if (index !== -1) {
+        array.splice(index, 1);
+        return true;
+      }
+    }
+    return false;
+  });
+
+  if (entityInfo) {
+    /* eslint-disable-next-line no-console */
+    console.log(`Deleted ${selectedEntity.type || 'entity'} from ${entityInfo.name}`);
+    // Clear selection
+    store.clearSelectedEntity();
+    // Trigger re-render
+    gameInstance.render();
+  } else {
+    /* eslint-disable-next-line no-console */
+    console.error('Selected entity not found in any array');
+  }
+};
+
 // Watch for changes in selected entity and sync with selectedTag
 // watch(() => store.selectedEntity, (newEntity) => {
 //   if (newEntity && (newEntity as any).type) {
@@ -182,7 +239,21 @@ watch(selectedTag, (newTag) => {
           />
         </b-field>
       </div>
+
+      <!-- Delete Entity Button -->
+      <b-field>
+        <b-button
+          type="is-danger"
+          size="is-small"
+          icon-left="delete"
+          @click="deleteSelectedEntity"
+        >
+          Delete Entity
+        </b-button>
+      </b-field>
+
       <hr />
+
     </div>
 
   </div>

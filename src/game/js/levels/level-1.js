@@ -51,6 +51,16 @@ export const EntryConfgs = [
     name: 'North opening (gap)',
     destinationLevel: 2,
   },
+  {
+    "x": 520,
+    "y": 215,
+    "width": 32,
+    "height": 120,
+    "destinationLevel": 0,
+    "destinationX": null,
+    "destinationY": null,
+    "type": "entry"
+  }
 ];
 
 // Village wall configurations

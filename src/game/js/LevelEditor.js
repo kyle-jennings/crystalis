@@ -72,8 +72,17 @@ export default class LevelEditor extends CrystalisGame {
         return;
       }
 
-      // Create new instance with position
-      const newObject = new ObjectClass(x,y,);
+      // Create temporary instance to get dimensions
+      const tempObject = new ObjectClass(0, 0);
+      const objectWidth = tempObject.width || 32;
+      const objectHeight = tempObject.height || 32;
+      
+      // Center the object at the mouse position
+      const centeredX = x - (objectWidth / 2);
+      const centeredY = y - (objectHeight / 2);
+
+      // Create new instance with centered position
+      const newObject = new ObjectClass(centeredX, centeredY);
 
       // Add to the appropriate array based on object type
       const typeMap = {

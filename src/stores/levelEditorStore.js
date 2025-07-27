@@ -27,11 +27,20 @@ export default defineStore(
     });
 
     // Computed properties
-    const availableLevels = computed(() => [
-      { value: 1, label: 'Level 1' },
-      { value: 2, label: 'Level 2' },
-      { value: 3, label: 'Level 3' },
-    ]);
+    const availableLevels = computed(() => {
+      if (gameInstance.value?.LEVELS) {
+        const levels = Object.keys(gameInstance.value.LEVELS).map((key) => ({
+          value: parseInt(key, 10),
+          label: `Level ${key}`,
+        }));
+        return levels.sort((a, b) => a.value - b.value);
+      }
+      return [
+        { value: 1, label: 'Level 1' },
+        { value: 2, label: 'Level 2' },
+        { value: 3, label: 'Level 3' },
+      ];
+    });
 
     // Actions
     const setSelectedLevel = (levelNumber) => {
@@ -104,6 +113,35 @@ export default defineStore(
       /* eslint-enable no-console */
     };
 
+    const createNewLevel = () => {
+      if (!gameInstance.value?.LEVELS) {
+        /* eslint-disable-next-line no-console */
+        console.warn('Game instance or LEVELS not available');
+        return;
+      }
+
+      // Find the next available level number
+      const existingLevels = Object.keys(gameInstance.value.LEVELS).map((key) => parseInt(key, 10));
+      const nextLevel = Math.max(...existingLevels) + 1;
+
+      // Create the new level with default settings
+      gameInstance.value.LEVELS[nextLevel] = {
+        width: levelSettings.value.width,
+        height: levelSettings.value.height,
+        backgroundColor: levelSettings.value.backgroundColor,
+        cameraWidth: levelSettings.value.cameraWidth,
+        cameraHeight: levelSettings.value.cameraHeight,
+        player: { x: 50, y: 50 },
+        entities: [],
+      };
+
+      // Switch to the new level
+      setSelectedLevel(nextLevel);
+
+      /* eslint-disable-next-line no-console */
+      console.log(`Created new level ${nextLevel}`);
+    };
+
     // Watchers
     watch(selectedLevel, (newLevel, oldLevel) => {
       // Only load level if it's actually different and we have a game instance
@@ -133,6 +171,7 @@ export default defineStore(
       updateToolSettings,
       clearSelectedEntity,
       logGameInstance,
+      createNewLevel,
     };
   },
 );

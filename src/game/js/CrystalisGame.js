@@ -12,9 +12,7 @@ import {
 
 // Import all level modules as objects
 import LevelBuilder from '@/game/js/classes/LevelBuilder.js';
-import Level1 from './levels/level-1.js';
-import Level2 from './levels/level-2.js';
-import Level3 from './levels/level-3.js';
+import LEVELS from '@/game/js/Levels.js';
 
 const CONFIG_DEFAULTS = Object.freeze({
   isEditMode: false,
@@ -35,15 +33,11 @@ export default class CrystalisGame {
 
 
     // Level registry for easy access
-    this.LEVELS = {
-      1: Level1,
-      2: Level2,
-      3: Level3,
-    };
+    this.LEVELS = LEVELS;
 
 
     // Game state
-    this.currentLevel = 1;
+    this.currentLevel = 0;
     this.maxLevel = 3;
     this.Level = new LevelBuilder(); // Will hold the active level module
     this.gameTime = 0;

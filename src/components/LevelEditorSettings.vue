@@ -70,6 +70,14 @@ const backgroundColor = computed({
     }
   },
 });
+
+// Debug function to log available levels
+const debugLevels = () => {
+  /* eslint-disable-next-line no-console */
+  console.log('Available Levels:', store.availableLevels);
+  /* eslint-disable-next-line no-console */
+  console.log('Game LEVELS:', (store.gameInstance as any)?.LEVELS);
+};
 </script>
 
 <template>
@@ -135,6 +143,30 @@ const backgroundColor = computed({
         type="color"
         placeholder="Select background color"
       />
+    </b-field>
+
+    <hr />
+
+    <h4 class="title is-5">Level Management</h4>
+
+    <!-- Create New Level Button -->
+    <b-field grouped>
+      <b-button
+        type="is-success"
+        size="is-small"
+        @click="store.createNewLevel"
+        icon-left="plus"
+      >
+        Create New Level
+      </b-button>
+      <b-button
+        type="is-warning"
+        size="is-small"
+        @click="debugLevels"
+        icon-left="bug"
+      >
+        Debug Levels
+      </b-button>
     </b-field>
 
     <hr />
