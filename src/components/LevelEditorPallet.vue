@@ -1,10 +1,14 @@
 <script setup lang="ts">
 import {
   ref,
-  computed,
+  // computed,
 } from 'vue';
 import '@types/interfaces';
 import GameEnvironmentObjects from '@game/js/lib/objectMappings';
+import useLevelEditorStore from '@/stores/levelEditorStore';
+
+// Use the Pinia store
+const store = useLevelEditorStore();
 
 interface PlaceableObjectFields {
   [key: string]: {
@@ -28,9 +32,8 @@ const environmentClasses = Object.keys(GameEnvironmentObjects)
 
 const tags = Object.keys(environmentClasses);
 const selectedTag = ref('');
-const selectedTool = computed(() => environmentClasses[selectedTag.value]);
+// const selectedTool = computed(() => environmentClasses[selectedTag.value].type);
 const filteredTags = ref(tags);
-const showSettings = ref(false);
 
 const getFilteredTags = (text: string) => {
   filteredTags.value = tags.filter((option) => option.toLowerCase().indexOf(text.toLowerCase()) >= 0);
@@ -39,7 +42,9 @@ const getFilteredTags = (text: string) => {
 
 <template>
   <div>
-    <b-field>
+    <h2 class="title is-4">Level Editor Pallet</h2>
+
+    <b-field label="Tiles">
       <b-autocomplete
         v-model="selectedTag"
         field="name"
@@ -51,56 +56,39 @@ const getFilteredTags = (text: string) => {
         @typing="getFilteredTags"
       />
     </b-field>
-    <hr />
-    <h3>Selected tool: <span>{{ selectedTag }}</span></h3>
-    <div
-      v-if="selectedTool"
-      class="form"
-    >
-      <b-button
-        label="settings"
-        @click="showSettings = !showSettings"
-      />
-      <b-collapse
-        :model-value="showSettings"
-      >
-        <b-field
-          v-for="(value, field) in selectedTool.fields"
-          :key="field"
-          :label="field"
-          :message="value.description"
-        >
+
+    <!-- Show selected entity properties when something is clicked -->
+    <div v-if="store.selectedEntity" class="selected-entity-panel mb-4">
+      <h5 class="title is-6">Selected Entity</h5>
+
+      <div v-for="(paramInfo, key) in (store.selectedEntity as any)?.constructor?.constructorParams || {}" :key="key">
+        <b-field :label="key" :message="paramInfo.description">
           <!-- Boolean fields -->
           <b-checkbox
-            v-if="value.type === 'boolean'"
-            :name="field"
+            v-if="paramInfo.type === 'boolean'"
+            v-model="(store.selectedEntity as any)[key]"
           >
-            {{ field }}
+            {{ key }}
           </b-checkbox>
 
           <!-- Number fields -->
           <b-numberinput
-            v-else-if="value.type === 'number'"
-            :name="field"
-            :placeholder="`Enter ${field}`"
+            v-else-if="paramInfo.type === 'number'"
+            v-model="(store.selectedEntity as any)[key]"
             controls-position="compact"
+            :placeholder="`Enter ${key}`"
           />
 
           <!-- String fields -->
           <b-input
-            v-else-if="value.type === 'string'"
-            :name="field"
-            :placeholder="`Enter ${field}`"
-          />
-
-          <!-- Fields with multiple types (e.g., 'number|null') -->
-          <b-input
             v-else
-            :name="field"
-            :placeholder="`Enter ${field} (${value.type})`"
+            v-model="(store.selectedEntity as any)[key]"
+            :placeholder="`Enter ${key} (${paramInfo.type})`"
           />
         </b-field>
-      </b-collapse>
+      </div>
+      <hr />
     </div>
+
   </div>
 </template>

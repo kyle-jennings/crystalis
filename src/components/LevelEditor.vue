@@ -1,36 +1,17 @@
 <script setup>
-import {
-  computed,
-  onMounted,
-} from 'vue';
+import { onMounted } from 'vue';
 import LevelEditorPallet from './LevelEditorPallet.vue';
 import LevelEditorSettings from './LevelEditorSettings.vue';
-import useLevelEditor from './useLevelEditor';
+import useLevelEditorStore from '@/stores/levelEditorStore';
 
-// Use the level editor composable
-const {
-  selectedLevel,
-  LevelEditor,
-} = useLevelEditor();
+// Use the Pinia store
+const store = useLevelEditorStore();
 
 onMounted(() => {
-  window.game = new LevelEditor({
+  store.initializeEditor({
     isEditMode: true,
     $elm: '#level-editor-wrapper #level-editor',
   });
-});
-
-// Get available levels based on the levels directory
-const availableLevels = computed(() => {
-  const levels = [];
-  // Based on the files in @game/js/levels directory
-  for (let i = 1; i <= 3; i++) {
-    levels.push({
-      value: i,
-      label: `Level ${i}`,
-    });
-  }
-  return levels;
 });
 
 </script>
@@ -41,11 +22,12 @@ const availableLevels = computed(() => {
     <div class="level-selector mb-4">
       <b-field label="Select Level" grouped>
         <b-select
-          v-model="selectedLevel"
+          :model-value="store.selectedLevel"
+          @update:model-value="store.setSelectedLevel"
           placeholder="Choose a level"
         >
           <option
-            v-for="level in availableLevels"
+            v-for="level in store.availableLevels"
             :key="level.value"
             :value="level.value"
           >
@@ -74,7 +56,7 @@ const availableLevels = computed(() => {
   </div>
 </template>
 
-<style>
+<style lang="scss">
 #editor-wrapper {
   display: flex;
   justify-content: space-between;
@@ -82,21 +64,51 @@ const availableLevels = computed(() => {
 }
 
 #level-editor-wrapper {
-  background: #f5f5f5;
-  border: 1px solid #ddd;
+  // background: #f5f5f5;
+  // border: 1px solid #ddd;
   flex-grow: 1;
   padding: 10px;
-  display: flex;
-}
+  // display: flex;
 
-/* #level-editor {
-  max-width: 100%;
-  height: auto;
-  width: 100%;
-} */
+  #level-editor {
+    border: 1px solid #ddd;
+
+  }
+}
 
 .level-selector {
   margin-bottom: 1rem;
+}
+
+// Set fixed width for tabs column
+.b-tabs {
+  width: 300px;
+  flex-shrink: 0;
+}
+
+// Mobile styles - stack everything vertically and make full width
+@media (max-width: 768px) {
+  #editor-wrapper {
+    display: block;
+    gap: 0;
+  }
+
+  #level-editor-wrapper {
+    width: 100%;
+    margin-top: 20px;
+    flex-grow: unset;
+  }
+
+  .level-selector {
+    width: 100%;
+  }
+
+  // Make tabs full width on mobile
+  .b-tabs {
+    width: 100%;
+    margin-bottom: 20px;
+    flex-shrink: unset;
+  }
 }
 
 </style>

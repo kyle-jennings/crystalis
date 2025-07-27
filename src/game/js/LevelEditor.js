@@ -45,15 +45,25 @@ export default class LevelEditor extends CrystalisGame {
       for (const obj of objArr) {
         if (this.isPointInEntity(x, y, obj)) {
           this.logEntityDetails(obj);
+          
+          // Update the Vue component via the store
+          if (this.setSelectedEntity) {
+            this.setSelectedEntity(obj);
+          }
+          
           return;
         }
       }
     }
 
-
     // If nothing was clicked, log the empty space
     console.log('=== EMPTY SPACE CLICKED ===');
     console.log(`Empty space at coordinates: (${x}, ${y})`);
+    
+    // Clear selection for empty space
+    if (this.setSelectedEntity) {
+      this.setSelectedEntity(null);
+    }
   }
 
   isPointInEntity(x, y, entity) {
