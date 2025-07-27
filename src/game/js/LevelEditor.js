@@ -26,6 +26,81 @@ export default class LevelEditor extends CrystalisGame {
       // Check what was clicked on
       this.identifyClickedEntity(clickX, clickY);
     });
+
+    // Add drag and drop support
+    this.canvas.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'copy';
+    });
+
+    this.canvas.addEventListener('drop', (e) => {
+      e.preventDefault();
+      this.handleCanvasDrop(e);
+    });
+  }
+
+  handleCanvasDrop(e) {
+    try {
+      const data = e.dataTransfer.getData('application/json');
+      if (!data) return;
+
+      const dragData = JSON.parse(data);
+      const rect = this.canvas.getBoundingClientRect();
+      
+      // Calculate world coordinates where the object was dropped
+      const dropX = e.clientX - rect.left + this.camera.x;
+      const dropY = e.clientY - rect.top + this.camera.y;
+
+      console.log(`Dropped ${dragData.objectType} at (${dropX}, ${dropY})`);
+      
+      // Create and place the new object
+      this.createObjectAtPosition(dragData.objectType, dropX, dropY);
+      
+    } catch (error) {
+      console.error('Error handling drop:', error);
+    }
+  }
+
+  createObjectAtPosition(objectType, x, y) {
+    // Import the object mappings to get the class
+    import('@game/js/lib/objectMappings').then((module) => {
+      const GameEnvironmentObjects = module.default;
+      const ObjectClass = GameEnvironmentObjects[objectType];
+      
+      if (!ObjectClass) {
+        console.error(`Unknown object type: ${objectType}`);
+        return;
+      }
+
+      // Create new instance with position
+      const newObject = new ObjectClass(x,y,);
+
+      // Add to the appropriate array based on object type
+      const typeMap = {
+        'House': this.houses,
+        'Wall': this.walls,
+        'Tree': this.trees,
+        'Mountain': this.mountains,
+        'Stalactite': this.stalactites,
+        'Cave': this.caves,
+        'Entry': this.entries,
+      };
+
+      const targetArray = typeMap[objectType];
+      console.log(objectType, targetArray);
+      if (targetArray) {
+        targetArray.push(newObject);
+        console.log(`Added new ${objectType} at (${x}, ${y})`);
+        
+        // Trigger a re-render
+        console.log(this);
+        this.render();
+      } else {
+        console.error(`No array found for object type: ${objectType}`);
+      }
+    }).catch(error => {
+      console.error('Error importing object mappings:', error);
+    });
   }
 
   identifyClickedEntity(x, y) {
