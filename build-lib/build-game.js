@@ -11,7 +11,7 @@ export default function copyGameCanvas() {
     name: 'copy-game-canvas',
     writeBundle() {
       const sourceDir = path.resolve(process.cwd(), 'src/game');
-      const targetDir = path.resolve(process.cwd(), 'game');
+      const targetDir = path.resolve(process.cwd(), 'game-dist');
 
       // Function to recursively copy directory
       function copyDirectory(src, dest) {
