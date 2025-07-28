@@ -2,10 +2,10 @@
 /* eslint-disable max-len */
 // Crystalis Clone - First Area Implementation
 
-import ExperienceOrb from '@game/js/classes/ExperienceOrb.js';
 import CombatSystem from './classes/CombatSystem.js';
 import MagicSystem from './classes/MagicSystem.js';
 import Player from './classes/Player.js';
+import ExperienceOrb from '@game/js/classes/ExperienceOrb.js';
 import {
   GAME_KEYS, MOVEMENT_KEYS, ACTION_KEYS, INPUT_CONFIG,
 } from './lib/inputMappings.js';
@@ -18,7 +18,6 @@ const CONFIG_DEFAULTS = Object.freeze({
   isEditMode: false,
   $elm: '#gameCanvas',
 });
-
 export default class CrystalisGame {
   constructor(userConfigs = CONFIG_DEFAULTS) {
     const configs = {
@@ -32,8 +31,10 @@ export default class CrystalisGame {
     this.width = this.canvas.width;
     this.height = this.canvas.height;
 
+
     // Level registry for easy access
     this.LEVELS = LEVELS;
+
 
     // Game state
     this.currentLevel = 0;
@@ -48,7 +49,7 @@ export default class CrystalisGame {
     this.player = new Player(256, 400); // Start in center of first area
     this.magicSystem = new MagicSystem(this.player, this);
     this.combatSystem = new CombatSystem(this.player, this);
-
+    
     // Game entities
     this.enemies = [];
     this.items = [];
@@ -84,6 +85,7 @@ export default class CrystalisGame {
 
     // Start game loop
     this.gameLoop();
+
   }
 
   loadLevel(levelNumber) {
@@ -99,7 +101,7 @@ export default class CrystalisGame {
 
     // Using new Level class
     console.log('Loading level using Level class');
-
+    
     // Reset player position to spawn point
     this.player.x = this.Level.playerX;
     this.player.y = this.Level.playerY;
@@ -108,12 +110,12 @@ export default class CrystalisGame {
     // Canvas dimensions: The actual HTML canvas element size (what the user sees)
     this.canvas.width = this.Level.canvasWidth;
     this.canvas.height = this.Level.canvasHeight;
-
+    
     // Logical/viewport dimensions: Used for camera calculations and rendering bounds
     // (Usually same as canvas dimensions, but can be different for scaling scenarios)
     this.width = this.Level.width;
     this.height = this.Level.height;
-
+    
     // World dimensions: The total game world size that entities can exist in
     // (Can be larger than canvas/viewport for scrolling levels)
     this.worldWidth = this.Level.worldWidth;
@@ -121,7 +123,7 @@ export default class CrystalisGame {
 
     // Initialize the level using the Level class
     this.Level.initialize(this);
-
+    
     console.log(`Loaded Level ${this.currentLevel}`);
   }
 
@@ -248,9 +250,9 @@ export default class CrystalisGame {
           mountains: this.mountains,
           stalactites: this.stalactites,
           houses: this.houses,
-          walls: this.walls,
+          walls: this.walls
         };
-
+        
         enemy.update(this.player, gameEntities);
       } else {
         // Still update animation even when frozen
@@ -305,7 +307,7 @@ export default class CrystalisGame {
     this.updateCamera();
 
     // Update magic system
-    this.magicSystem.update(1 / 60); // Pass delta time
+    this.magicSystem.update(1/60); // Pass delta time
   }
 
   handleInput() {
@@ -415,7 +417,7 @@ export default class CrystalisGame {
   updateCamera() {
     // this.Level is already the LevelBuilder instance
     const levelInstance = this.Level;
-
+    
     if (levelInstance) {
       // Using Level class
       // If level canvas size matches world size, use fixed camera (like village)
@@ -519,9 +521,9 @@ export default class CrystalisGame {
   drawBackground() {
     // this.Level is already the LevelBuilder instance
     const levelInstance = this.Level;
-
+    
     let backgroundColor;
-
+    
     if (levelInstance) {
       // Using Level class
       backgroundColor = levelInstance.backgroundColor;
@@ -589,4 +591,5 @@ export default class CrystalisGame {
     this.render();
     requestAnimationFrame(() => this.gameLoop());
   }
+
 }

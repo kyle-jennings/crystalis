@@ -8,8 +8,15 @@
 </head>
 <body>
     <div id="app"></div>
-    <script type="module" src="./js/CrystalisGame.js"></script>
+    <script type="importmap">
+        {
+            "imports": {
+                "CrystalisGame": "./js/CrystalisGame.js"
+            }
+        }
+    </script>
     <script>
+        import CrystalisGame from "CrystalisGame";
         // Start the game when page loads
         window.addEventListener('load', () => {
             window.CrystalisGame = new CrystalisGame();
