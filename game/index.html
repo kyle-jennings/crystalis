@@ -10,9 +10,10 @@
     <div id="app"></div>
     <script type="module" src="./js/CrystalisGame.js"></script>
     <script>
-        window.load(() => {
-            new CrystalisGame();
-        })
+        // Start the game when page loads
+        window.addEventListener('load', () => {
+            window.CrystalisGame = new CrystalisGame();
+        });
     </script>
 </body>
 </html>
