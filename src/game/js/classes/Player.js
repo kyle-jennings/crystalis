@@ -1,4 +1,5 @@
 // Player.js - Player class for Crystalis game
+const PLAYER_DIMS = [24, 14]
 export default class Player {
   static constructorParams = {
     x: {
@@ -146,8 +147,8 @@ export default class Player {
   constructor(x, y) {
     this.x = x;
     this.y = y;
-    this.width = 14;
-    this.height = 33;
+    this.width = PLAYER_DIMS[1];
+    this.height = PLAYER_DIMS[0];
     this.speed = 2;
     this.facing = 0; // 0-7 for 8 directions (0=up, 2=right, 4=down, 6=left)
 
@@ -193,8 +194,8 @@ export default class Player {
     // Sprite animation properties
     this.spriteSheet = new Image();
     this.spriteSheet.src = '/assets/walking.png'; // Public assets path for Vite
-    this.frameWidth = 14; // Width of each sprite frame
-    this.frameHeight = 33; // Height of each sprite frame
+    this.frameWidth = PLAYER_DIMS[1]; // Width of each sprite frame
+    this.frameHeight = PLAYER_DIMS[0]; // Height of each sprite frame
     this.framesPerDirection = 2; // 3 frames per walking direction
     this.animationSpeed = 10; // Frames to wait between sprite updates (slower = higher number)
     this.animationTimer = 0;
@@ -520,7 +521,7 @@ export default class Player {
     ctx.shadowBlur = 0;
 
     // Draw facing direction indicator
-    ctx.fillStyle = '#FFD700'; // Gold
+    ctx.fillStyle = 'transparent'; // Gold
     const centerX = this.x + this.width / 2;
     const centerY = this.y + this.height / 2;
     // Adjust angle so that facing 0 (up) corresponds to -PI/2 radians

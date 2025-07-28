@@ -5,6 +5,10 @@
 			"path": "."
 		},
 		{
+			"name": "Game Src",
+			"path": "src/game"
+		},
+		{
 			"name": "Buefy",
 			"path": "node_modules/buefy/src"
 		},
@@ -27,7 +31,9 @@
 		"files.exclude": {
 			"**/.git": true,
 			"**/.DS_Store": true,
-			"**/node_modules": true
+			"**/node_modules": true,
+			"dist": true,
+			"game": true,
 		}
 	},
 }
