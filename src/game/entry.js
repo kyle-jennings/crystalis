@@ -1,4 +1,4 @@
-import CrystalisGame from "./js/CrystalisGame";
+import CrystalisGame from "./js/CrystalisGame.js";
 // Start the game when page loads
 window.addEventListener('load', () => {
   console.log('load the game!');
