@@ -146,8 +146,8 @@ export default class Player {
   constructor(x, y) {
     this.x = x;
     this.y = y;
-    this.width = 16;
-    this.height = 16;
+    this.width = 14;
+    this.height = 33;
     this.speed = 2;
     this.facing = 0; // 0-7 for 8 directions (0=up, 2=right, 4=down, 6=left)
 
@@ -189,6 +189,29 @@ export default class Player {
     this.animFrame = 0;
     this.animTime = 0;
     this.isMoving = false;
+
+    // Sprite animation properties
+    this.spriteSheet = new Image();
+    this.spriteSheet.src = '/assets/walking.png'; // Public assets path for Vite
+    this.frameWidth = 14; // Width of each sprite frame
+    this.frameHeight = 33; // Height of each sprite frame
+    this.framesPerDirection = 2; // 3 frames per walking direction
+    this.animationSpeed = 10; // Frames to wait between sprite updates (slower = higher number)
+    this.animationTimer = 0;
+    this.currentSpriteFrame = 0; // Current frame in the animation (0, 1, 2)
+    
+    // Direction mapping for sprite sheet rows
+    // Your sprite sheet has: Down, Left, Right, Up, Down-Left, Down-Right, Up-Left, Up-Right
+    this.spriteDirections = {
+      0: 4,    // Up -> Row 3
+      1: 4,    // Up-Right -> Row 7  
+      2: 1,    // Right -> Row 1
+      3: 2,    // Down-Right -> Row 5
+      4: 0,    // Down -> Row 0
+      5: 0,    // Down-Left -> Row 4
+      6: 5,    // Left -> Row 1
+      7: 5     // Up-Left -> Row 6
+    };
   }
 
   move(dx, dy, worldWidth = 1024, worldHeight = 768) {
@@ -200,15 +223,8 @@ export default class Player {
       this.isMoving = dx !== 0 || dy !== 0;
 
       if (this.isMoving) {
-        // Update facing direction only when not dashing
-        if (dy < 0 && dx === 0) this.facing = 0; // Up
-        else if (dy < 0 && dx > 0) this.facing = 1; // Up-Right
-        else if (dy === 0 && dx > 0) this.facing = 2; // Right
-        else if (dy > 0 && dx > 0) this.facing = 3; // Down-Right
-        else if (dy > 0 && dx === 0) this.facing = 4; // Down
-        else if (dy > 0 && dx < 0) this.facing = 5; // Down-Left
-        else if (dy === 0 && dx < 0) this.facing = 6; // Left
-        else if (dy < 0 && dx < 0) this.facing = 7; // Up-Left
+        // Update facing direction using our new method
+        this.updateFacing(dx, dy);
       }
     }
 
@@ -380,7 +396,10 @@ export default class Player {
   }
 
   update() {
-    // Update animation
+    // Update sprite animation
+    this.updateSpriteAnimation();
+
+    // Update animation (keep existing logic for compatibility)
     if (this.isMoving && !this.isDashing) {
       this.animTime += 1 / 60;
       if (this.animTime > 0.2) {
@@ -494,9 +513,8 @@ export default class Player {
       ctx.shadowBlur = 5;
     }
 
-    // Draw player (simple colored rectangle for now)
-    ctx.fillStyle = this.isDashing ? '#87CEEB' : '#4169E1'; // Light blue when dashing
-    ctx.fillRect(this.x, this.y, this.width, this.height);
+    // Draw player sprite
+    this.drawSprite(ctx);
 
     // Reset shadow
     ctx.shadowBlur = 0;
@@ -567,5 +585,78 @@ export default class Player {
       case 'Thunder': return '#FFD700';
       default: return '#FFFFFF';
     }
+  }
+
+  /**
+   * Update sprite animation based on movement and direction
+   */
+  updateSpriteAnimation() {
+    if (this.isMoving && !this.isDashing) {
+      // Increment animation timer
+      this.animationTimer++;
+      
+      // Change frame when timer reaches speed threshold
+      if (this.animationTimer >= this.animationSpeed) {
+        this.currentSpriteFrame = (this.currentSpriteFrame + 1) % this.framesPerDirection;
+        this.animationTimer = 0;
+      }
+    } else {
+      // When not moving, use middle frame (frame 1) for idle pose
+      this.currentSpriteFrame = 1;
+      this.animationTimer = 0;
+    }
+  }
+
+  /**
+   * Get the sprite sheet row for the current facing direction
+   */
+  getSpriteRow() {
+    return this.spriteDirections[this.facing] || 0;
+  }
+
+  /**
+   * Update facing direction based on movement
+   */
+  updateFacing(dx, dy) {
+    if (dx === 0 && dy === 0) return; // Don't change facing when not moving
+
+    // Calculate 8-directional facing based on dx, dy
+    if (dy < 0) { // Moving up
+      if (dx < 0) this.facing = 7;      // Up-Left
+      else if (dx > 0) this.facing = 1; // Up-Right
+      else this.facing = 0;             // Up
+    } else if (dy > 0) { // Moving down
+      if (dx < 0) this.facing = 5;      // Down-Left
+      else if (dx > 0) this.facing = 3; // Down-Right
+      else this.facing = 4;             // Down
+    } else { // Moving horizontally
+      if (dx < 0) this.facing = 6;      // Left
+      else this.facing = 2;             // Right
+    }
+  }
+
+  /**
+   * Draw the player sprite from the sprite sheet
+   */
+  drawSprite(ctx) {
+    // Check if sprite sheet is loaded
+    if (!this.spriteSheet.complete || this.spriteSheet.naturalWidth === 0) {
+      // Fallback to rectangle if sprite isn't loaded yet
+      ctx.fillStyle = this.isDashing ? '#87CEEB' : '#4169E1';
+      ctx.fillRect(this.x, this.y, this.width, this.height);
+      return;
+    }
+
+    // Calculate source coordinates in sprite sheet
+    const spriteRow = this.getSpriteRow();
+    const sourceX = this.currentSpriteFrame * this.frameWidth;
+    const sourceY = spriteRow * this.frameHeight;
+
+    // Draw the sprite
+    ctx.drawImage(
+      this.spriteSheet,
+      sourceX, sourceY, this.frameWidth, this.frameHeight, // Source rectangle
+      this.x, this.y, this.width, this.height // Destination rectangle
+    );
   }
 }
