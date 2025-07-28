@@ -1,0 +1,258 @@
+/* Crystalis Clone - Game Styles */
+
+#mainFlexWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 10px;
+  padding: 20px;
+}
+
+#canvasFlexWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  flex-direction: row;
+  gap: 10px;
+  padding: 20px;
+}
+
+
+#gameContainer {
+    position: relative;
+    background-color: #222;
+    border: 3px solid #666;
+    border-radius: 8px;
+}
+
+/* Editor Container Styles */
+#editorContainer {
+    display: none;
+    position: relative;
+    background-color: #222;
+    border: 3px solid #444;
+    border-radius: 8px;
+}
+
+#editorCanvas {
+    display: block;
+    background-color: #2d5016;
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+    border: 1px solid #666;
+}
+
+#editorUI {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 10px;
+    max-width: 200px;
+    font-size: 11px;
+}
+
+#editorUI h4 {
+    margin: 0 0 10px 0;
+    color: #44ff44;
+}
+
+/* Object Palette Styles */
+#objectPalette {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 5px;
+    margin: 10px 0;
+}
+
+.object-btn {
+    padding: 8px;
+    background: #444;
+    color: white;
+    border: 2px solid transparent;
+    cursor: pointer;
+    font-size: 10px;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.object-palette-btn {
+    padding: 10px;
+    color: white;
+    cursor: pointer;
+    font-size: 10px;
+    background: #444;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.object-palette-btn:hover {
+    background: #555;
+}
+
+.object-palette-btn.selected {
+    border-color: #0af;
+    background: #0066cc;
+}
+
+.object-palette-btn .icon {
+    width: 16px;
+    height: 16px;
+    margin: 0 auto 4px;
+    border-radius: 2px;
+}
+
+.object-palette {
+    
+}
+
+.object-btn:hover {
+    background: #555;
+}
+
+.object-btn.selected {
+    border-color: #0af;
+    background: #0066cc;
+}
+
+#gameCanvas {
+    display: block;
+    background-color: #2d5016; /* Forest green background */
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+}
+
+#ui {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    color: #fff;
+    font-size: 14px;
+    text-shadow: 2px 2px 0px #000;
+    z-index: 10;
+}
+
+#ui .stat {
+    margin-bottom: 5px;
+}
+
+#ui .hp-bar {
+    width: 100px;
+    height: 8px;
+    background-color: #333;
+    border: 1px solid #fff;
+    margin-top: 3px;
+}
+
+#ui .hp-fill {
+    height: 100%;
+    background-color: #ff4444;
+    transition: width 0.3s ease;
+}
+
+#ui .mp-bar {
+    width: 100px;
+    height: 8px;
+    background-color: #333;
+    border: 1px solid #fff;
+    margin-top: 3px;
+}
+
+#ui .mp-fill {
+    height: 100%;
+    background-color: #4444ff;
+    transition: width 0.3s ease;
+}
+
+#instructions {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    color: #ccc;
+    font-size: 12px;
+    text-shadow: 1px 1px 0px #000;
+    max-width: 300px;
+}
+
+#instructionsHeader {
+    color: #fff;
+    font-weight: bold;
+    user-select: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+#instructionsHeader span:last-child {
+    margin-left: 5px;
+}
+
+#instructionsToggle {
+    transition: transform 0.3s ease;
+    font-size: 10px;
+}
+
+#instructionsToggle.collapsed {
+    transform: rotate(-90deg);
+}
+
+#instructionsContent {
+    transition: max-height 0.3s ease, opacity 0.3s ease;
+    overflow: hidden;
+    max-height: 200px;
+    opacity: 1;
+}
+
+#instructionsContent.collapsed {
+    max-height: 0;
+    opacity: 0;
+}
+
+.controls {
+    margin-bottom: 3px;
+}
+
+#devControls {
+    margin-top: 10px;
+    border-top: 1px solid #666;
+    padding-top: 5px;
+    display: none;
+}
+
+#devControls .controls {
+    color: #ff4444;
+}
+
+#toggleEnemiesBtn {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    padding: 8px 12px;
+    background-color: #4169E1;
+    color: white;
+    border: 2px solid #FFD700;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#toggleEnemiesBtn:hover {
+    background-color: #5A7FE7;
+}
+
+#toggleEnemiesBtn.enemies-frozen {
+    background-color: #FF4444;
+    border-color: #FFF;
+}
+
+#toggleEnemiesBtn.enemies-frozen:hover {
+    background-color: #FF6666;
+}

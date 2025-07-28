@@ -2,54 +2,47 @@ import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import eslint from 'vite-plugin-eslint';
 import path from 'path';
-// import copyGameCanvas from './build-lib/build-game.js';
+import copyGameCanvas from './build-lib/build-game.js';
 
 const root = path.resolve(__dirname);
 const src = path.resolve(root, 'src');
 const gameRoot = path.resolve(root, 'src', 'game');
 
-export default defineConfig(({ mode }) => {
-  const isGameBuild = mode === 'game';
-
-  return {
-    plugins: [
-      vue(),
-      {
-        ...eslint(
-          {
-            failOnWarning: false,
-            failOnError: true,
-          },
-        ),
-        apply: 'build',
-      },
-      {
-        ...eslint({
+export default defineConfig({
+  plugins: [
+    vue(),
+    {
+      ...eslint(
+        {
           failOnWarning: false,
           failOnError: true,
-        }),
-        apply: 'serve',
-        enforce: 'post',
-      },
-      // copyGameCanvas(),
-    ],
-    root: '.',
-    build: {
-      outDir: isGameBuild ? 'game' : 'dist',
-      rollupOptions: isGameBuild ? {
-        input: path.resolve(__dirname, 'game.html'),
-      } : undefined,
+        },
+      ),
+      apply: 'build',
     },
-    server: {
-      port: 8000,
-      open: true,
+    {
+      ...eslint({
+        failOnWarning: false,
+        failOnError: true,
+      }),
+      apply: 'serve',
+      enforce: 'post',
     },
-    resolve: {
-      alias: {
-        '@': src,
-        '@game': gameRoot,
-        '@types': path.resolve(root, 'types'),
-      },
+    copyGameCanvas(),
+  ],
+  root: '.',
+  build: {
+    outDir: 'dist',
+  },
+  server: {
+    port: 8000,
+    open: true,
+  },
+  resolve: {
+    alias: {
+      '@': src,
+      '@game': gameRoot,
+      '@types': path.resolve(root, 'types'),
     },
-  };
+  },
 });

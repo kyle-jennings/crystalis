@@ -5,9 +5,7 @@
   "scripts": {
     "start": "vite",
     "dev": "vite",
-    "dev:game": "vite --mode game game.html",
     "build": "vite build",
-    "build:game": "vite build --mode game",
     "preview": "vite preview",
     "serve": "vite preview"
   },
