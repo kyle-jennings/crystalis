@@ -40,6 +40,11 @@ export default defineConfig(({ mode }) => {
         input: {
           index: path.resolve(__dirname, 'game.html'),
         },
+        output: {
+          entryFileNames: 'assets/[name].js',
+          chunkFileNames: 'assets/[name].js',
+          assetFileNames: 'assets/[name].[ext]',
+        },
       } : undefined,
     },
     server: {
