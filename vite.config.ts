@@ -37,11 +37,10 @@ export default defineConfig(({ mode }) => {
     build: {
       outDir: isGameBuild ? 'game-dist' : 'dist',
       rollupOptions: isGameBuild ? {
-        input: path.resolve(__dirname, 'game.html'),
+        input: {
+          index: path.resolve(__dirname, 'game.html'),
+        },
       } : undefined,
-      // rollupOptions: isGameBuild ? {
-      //   main: path.resolve(__dirname, 'game.ts')
-      // } : undefined,
     },
     server: {
       port: 8000,
