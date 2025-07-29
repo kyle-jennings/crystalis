@@ -55,6 +55,14 @@ function fixAssetPaths(filePath) {
     // Replace href="/assets/ with href="./assets/ (for HTML)
     content = content.replace(/href=\"\/assets\//g, 'href="./assets/');
 
+    // Replace "assets/assets/" with "assets/" (with double quotes)
+    content = content.replace(/\"assets\/assets\//g, '"assets/');
+
+    // Replace 'assets/assets/' with 'assets/' (with single quotes)
+    content = content.replace(/\'assets\/assets\//g, "'assets/");
+
+    // Replace url(assets/assets/ with url(assets/ (for CSS)
+    content = content.replace(/url\(assets\/assets\//g, 'url(assets/');
     if (content !== originalContent) {
       fs.writeFileSync(filePath, content, 'utf8');
       console.log(`✅ Fixed asset paths in: ${path.relative(process.cwd(), filePath)}`);
