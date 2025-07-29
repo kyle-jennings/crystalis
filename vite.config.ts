@@ -2,7 +2,6 @@ import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import eslint from 'vite-plugin-eslint';
 import path from 'path';
-// import copyGameCanvas from './build-lib/build-game.js';
 
 const root = path.resolve(__dirname);
 const src = path.resolve(root, 'src');
@@ -31,7 +30,6 @@ export default defineConfig(({ mode }) => {
         apply: 'serve',
         enforce: 'post',
       },
-      // copyGameCanvas(),
     ],
     root: '.',
     build: {

@@ -5,8 +5,9 @@
   "scripts": {
     "start": "vite",
     "dev": "vite",
-    "build": "vite build",
-    "build:game": "vite build --mode game",
+    "build": "vite build && node scripts/fix-asset-paths.js --target dist",
+    "build:game": "vite build --mode game && node scripts/fix-asset-paths.js --target game-dist",
+    "fix-paths": "node scripts/fix-asset-paths.js",
     "preview": "vite preview",
     "serve": "vite preview"
   },
