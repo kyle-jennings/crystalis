@@ -493,7 +493,7 @@ export default {
       "height": 60,
       "type": "mountain",
       hasPortal: true,
-      portalDestination: 3,
+      portalDestination: 0,
       "enemyCollisionX": 135,
       "enemyCollisionY": 77,
       "enemyCollisionWidth": 60,
