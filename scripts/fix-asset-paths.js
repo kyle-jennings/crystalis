@@ -77,6 +77,29 @@ function fixAssetPaths(filePath) {
 }
 
 /**
+ * Rename game.html to index.html in the build directory
+ * @param {string} buildDir - The build directory path
+ */
+function renameGameHtml(buildDir) {
+  const gameHtmlPath = path.join(buildDir, 'game.html');
+  const indexHtmlPath = path.join(buildDir, 'index.html');
+
+  if (fs.existsSync(gameHtmlPath)) {
+    try {
+      fs.renameSync(gameHtmlPath, indexHtmlPath);
+      console.log('✅ Renamed game.html to index.html');
+      return true;
+    } catch (error) {
+      console.error('❌ Error renaming game.html to index.html:', error.message);
+      return false;
+    }
+  } else {
+    console.log('ℹ️  game.html not found, skipping rename');
+    return false;
+  }
+}
+
+/**
  * Main function to fix all asset paths in the build directory
  */
 function main(target) {
@@ -86,6 +109,11 @@ function main(target) {
   }
   console.log('🔍 Searching for files to fix asset paths...');
   console.log(`📁 Build directory: ${buildDir}\n`);
+
+  // Rename game.html to index.html if target is game-dist
+  if (target === 'game-dist') {
+    renameGameHtml(buildDir);
+  }
 
   // Find all HTML, CSS, and JS files
   const files = findFiles(buildDir, ['.html', '.css', '.js']);
@@ -131,4 +159,4 @@ if (require.main === module) {
   main(target);
 }
 
-module.exports = { fixAssetPaths, findFiles };
+module.exports = { fixAssetPaths, findFiles, renameGameHtml };
